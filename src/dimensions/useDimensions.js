@@ -2,7 +2,7 @@
 'use strict'
 
 import React, { useState, useEffect } from "react"
-import { Dimensions } from "./dimensions"
+import { Dimensions } from "ReDimensions"
 
 // Get the original window dimensions
 const dims = Dimensions.get("window")

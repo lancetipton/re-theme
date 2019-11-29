@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react'
 import { isObj } from 'jsutils'
 import { ReThemeContext } from './context'
-import { Dimensions } from "../dimensions/dimensions"
+import { Dimensions } from "ReDimensions"
 import { buildTheme, getDefaultTheme } from '../theme'
 
 // Get the original window dimensions

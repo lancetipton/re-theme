@@ -7,6 +7,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var React = require('react');
 var React__default = _interopDefault(React);
 var jsutils = require('jsutils');
+var reactNative = require('react-native');
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -124,106 +125,18 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
-var addListener = function addListener(element, event, method, options) {
-  element && jsutils.checkCall(element.addEventListener, event, method, options || false);
-};
-
-var hasDomAccess = function hasDomAccess() {
-  return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
-};
-
-var getWindow = function getWindow() {
-  var winAccess = !hasDomAccess();
-  return winAccess ? {
-    devicePixelRatio: undefined,
-    innerHeight: undefined,
-    innerWidth: undefined,
-    screen: {
-      height: undefined,
-      width: undefined
-    }
-  } : function () {
-    return window;
-  }();
-};
-
-var Constants = jsutils.deepFreeze({
-  BUILD_EVENT: 'build',
-  CHANGE_EVENT: 'change',
-  RESIZE_EVENT: 'resize'
-});
-
-var DEBOUNCE_RATE = 100;
-var domAccess = hasDomAccess();
-var winDim = getWindow();
-var setScreen = function setScreen(win) {
-  return {
-    fontScale: 1,
-    height: win.screen.height,
-    scale: win.devicePixelRatio || 1,
-    width: win.screen.width
-  };
-};
-var setWin = function setWin(win) {
-  return {
-    fontScale: 1,
-    height: win.innerHeight,
-    scale: win.devicePixelRatio || 1,
-    width: win.innerWidth
-  };
-};
-var dimensions = {
-  window: setWin(winDim),
-  screen: setScreen(winDim)
-};
 var listeners = {};
-var get = function get(dimension) {
-  return dimensions[dimension];
-};
-var set = function set(_ref) {
-  var screen = _ref.screen,
-      win = _ref.window;
-  if (screen) dimensions.screen = screen;
-  if (win) dimensions.window = win;
-};
-var update = function update() {
-  dimensions.window = setWin(winDim);
-  dimensions.screen = setScreen(winDim);
-  jsutils.isArr(listeners[Constants.CHANGE_EVENT]) && listeners[Constants.CHANGE_EVENT].forEach(function (listener) {
-    return listener(dimensions);
-  });
-};
-var addEventListener = function addEventListener(type, listener) {
-  if (!type || !jsutils.isFunc(listener)) return;
-  listeners[type] = listeners[type] || [];
-  listeners[type].push(listener);
-};
-var removeEventListener = function removeEventListener(type, removeListener) {
-  type && jsutils.isFunc(removeListener) && jsutils.isArr(listeners[type]) && (listeners[type] = listeners[type].filter(function (listener) {
-    return listener !== removeListener;
-  }));
-};
-domAccess && addListener(window, Constants.RESIZE_EVENT, jsutils.debounce(update, DEBOUNCE_RATE));
-var Dimensions = {
-  get: get,
-  set: set,
-  update: update,
-  addEventListener: addEventListener,
-  removeEventListener: removeEventListener
-};
-
-var listeners$1 = {};
 var addThemeEvent = function addThemeEvent(event, listener) {
   if (!event || !jsutils.isFunc(listener)) return;
-  listeners$1[event] = listeners$1[event] || [];
-  listeners$1[event].push(listener);
-  return listeners$1[event].length - 1;
+  listeners[event] = listeners[event] || [];
+  listeners[event].push(listener);
+  return listeners[event].length - 1;
 };
 var removeThemeEvent = function removeThemeEvent(event, removeListener) {
-  if (!event || !listeners$1[event] || !removeListener && removeListener !== 0) return;
+  if (!event || !listeners[event] || !removeListener && removeListener !== 0) return;
   isNum(removeListener)
-  ? listeners$1[event].splice(removeListener, 1)
-  : jsutils.isFunc(removeListener) && jsutils.isArr(listeners$1[event]) && (listeners$1[event] = listeners$1[event].filter(function (listener) {
+  ? listeners[event].splice(removeListener, 1)
+  : jsutils.isFunc(removeListener) && jsutils.isArr(listeners[event]) && (listeners[event] = listeners[event].filter(function (listener) {
     return listener !== removeListener;
   }));
 };
@@ -231,10 +144,16 @@ var fireThemeEvent = function fireThemeEvent(event) {
   for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     params[_key - 1] = arguments[_key];
   }
-  jsutils.isArr(listeners$1[event]) && listeners$1[event].forEach(function (listener) {
+  jsutils.isArr(listeners[event]) && listeners[event].forEach(function (listener) {
     return listener.apply(void 0, params);
   });
 };
+
+var Constants = jsutils.deepFreeze({
+  BUILD_EVENT: 'build',
+  CHANGE_EVENT: 'change',
+  RESIZE_EVENT: 'resize'
+});
 
 var sizeMap = {
   entries: [['xsmall', 1], ['small', 320], ['medium', 768], ['large', 1024], ['xlarge', 1366]],
@@ -291,7 +210,7 @@ var getSizeMap = function getSizeMap() {
   return sizeMap;
 };
 
-var dims = Dimensions.get("window");
+var dims = reactNative.Dimensions.get("window");
 var useDimensions = function useDimensions() {
   var _useState = React.useState(dims),
       _useState2 = _slicedToArray(_useState, 2),
@@ -311,9 +230,9 @@ var useDimensions = function useDimensions() {
     });
   };
   React.useEffect(function () {
-    Dimensions.addEventListener("change", onChange);
+    reactNative.Dimensions.addEventListener("change", onChange);
     return function () {
-      return Dimensions.removeEventListener("change", onChange);
+      return reactNative.Dimensions.removeEventListener("change", onChange);
     };
   }, []);
   return dimensions;
@@ -355,7 +274,7 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme) {
 };
 
 var defaultTheme = {};
-var dims$1 = Dimensions.get("window");
+var dims$1 = reactNative.Dimensions.get("window");
 var setDefaultTheme = function setDefaultTheme(theme) {
   var merge = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   if (!jsutils.isObj(theme)) return console.warn("setDefaultTheme method requires an theme object as the first argument. Received: ", theme);
@@ -379,26 +298,9 @@ var withTheme = function withTheme(Component) {
   };
 };
 
-var useTheme = function useTheme() {
-  var _useState = React.useState(orgTheme),
-      _useState2 = _slicedToArray(_useState, 2),
-      theme = _useState2[0],
-      setTheme = _useState2[1];
-  var onChange = function onChange(_ref) {
-    var win = _ref.window;
-    buildTheme(theme, win.width, win.height);
-    setTheme(theme);
-  };
-  React.useEffect(function () {
-    Dimensions.addEventListener(Constants.CHANGE_EVENT, onChange);
-    return function () {
-      Dimensions.removeEventListener(Constants.CHANGE_EVENT, onChange);
-    };
-  }, []);
-  return theme;
-};
+var useTheme = function useTheme() {};
 
-var dims$2 = Dimensions.get("window");
+var dims$2 = reactNative.Dimensions.get("window");
 var ReThemeProvider = function ReThemeProvider(props) {
   var children = props.children,
       theme = props.theme,
@@ -422,9 +324,9 @@ var ReThemeProvider = function ReThemeProvider(props) {
     });
   };
   React.useEffect(function () {
-    Dimensions.addEventListener("change", onChange);
+    reactNative.Dimensions.addEventListener("change", onChange);
     return function () {
-      return Dimensions.removeEventListener("change", onChange);
+      return reactNative.Dimensions.removeEventListener("change", onChange);
     };
   }, []);
   return React__default.createElement(ReThemeContext.Provider, {

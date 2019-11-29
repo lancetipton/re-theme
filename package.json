@@ -2,19 +2,25 @@
   "name": "re-theme",
   "version": "1.1.0",
   "description": "Simple Theme switcher / builder for React and React Native",
-  "main": "index.js",
+  "main": "build",
   "repository": "https://github.com/lancetipton/ReTheme",
   "author": "Lance Tipton",
   "license": "MIT",
   "scripts": {
-    "dev": "rollup -c -w",
-    "build": "rollup -c"
+    "dev": "rollup -c rollup.config.js -w",
+    "build": "rollup -c rollup.config.js",
+    "test": "NODE_ENV=test jest --no-cache --verbose"
   },
   "devDependencies": {
     "@babel/core": "7.5.5",
+    "@rollup/plugin-alias": "^2.2.0",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/preset-env": "7.5.5",
     "@babel/preset-react": "^7.6.3",
+    "babel-jest": "24.9.0",
+    "jest": "24.7.1",
+    "jsutils": "git+https://github.com/lancetipton/jsutils.git",
+    "react": "16.9.0",
     "rollup": "1.20.3",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-cleanup": "3.1.1",
@@ -33,5 +39,28 @@
     "react-native": "0.61.1",
     "react-native-web": "0.11.7"
   },
-  "dependencies": {}
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.js?(x)"
+    ],
+    "collectCoverageFrom": [
+      "<rootDir>/src/index.js"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "jsx",
+      "es6"
+    ],
+    "globals": {
+      "__DEV__": true
+    },
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/setupTests.js"
+    ]
+  }
 }
