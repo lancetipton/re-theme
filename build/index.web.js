@@ -319,8 +319,30 @@ var useDimensions = function useDimensions() {
   return dimensions;
 };
 
+var buildSizedThemes = function buildSizedThemes(theme, sizedTheme, size) {
+  var printData = !jsutils.isEmpty(sizedTheme);
+  return jsutils.reduceObj(theme, function (name, value, sizedTheme) {
+    if (!jsutils.isObj(value)) return sizedTheme;
+    if (name === size) {
+      var mergedSize = jsutils.deepMerge(sizedTheme, value);
+      jsutils.unset(theme, [size]);
+      return mergedSize;
+    }
+    var subSized = buildSizedThemes(value, sizedTheme[name] || {}, size);
+    if (!jsutils.isEmpty(subSized)) sizedTheme[name] = subSized;
+    return sizedTheme;
+  }, sizedTheme);
+};
+var buildSizedTheme = function buildSizedTheme(theme) {
+  return getSizeMap().keys.reduce(function (themeSized, size) {
+    var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
+    if (!jsutils.isEmpty(builtSize)) themeSized[size] = builtSize;
+    return themeSized;
+  }, theme);
+};
 var mergeWithDefault = function mergeWithDefault(theme, defaultTheme) {
-  return defaultTheme && theme !== defaultTheme ? jsutils.deepMerge(defaultTheme, theme) : theme;
+  var mergedTheme = defaultTheme && theme !== defaultTheme ? jsutils.deepMerge(defaultTheme, theme) : theme;
+  return buildSizedTheme(mergedTheme);
 };
 var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {
   var extraTheme = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -336,13 +358,13 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme) {
       _getSize2 = _slicedToArray(_getSize, 2),
       key = _getSize2[0],
       size = _getSize2[1];
-  var _mergeWithDefault = mergeWithDefault(theme, defaultTheme),
-      xsmall = _mergeWithDefault.xsmall,
-      small = _mergeWithDefault.small,
-      medium = _mergeWithDefault.medium,
-      large = _mergeWithDefault.large,
-      xlarge = _mergeWithDefault.xlarge,
-      extraTheme = _objectWithoutProperties(_mergeWithDefault, ["xsmall", "small", "medium", "large", "xlarge"]);
+  var mergedTheme = mergeWithDefault(theme, defaultTheme);
+  var xsmall = mergedTheme.xsmall,
+      small = mergedTheme.small,
+      medium = mergedTheme.medium,
+      large = mergedTheme.large,
+      xlarge = mergedTheme.xlarge,
+      extraTheme = _objectWithoutProperties(mergedTheme, ["xsmall", "small", "medium", "large", "xlarge"]);
   var builtTheme = size ? joinThemeSizes(theme, key, extraTheme) : extraTheme;
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme);
   builtTheme.RTMeta = {
