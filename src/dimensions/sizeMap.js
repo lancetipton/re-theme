@@ -6,6 +6,7 @@ import { mapObj, isObj, toNum, isNum } from 'jsutils'
 /**
  * Default sizes for a screen width
  * <br/> Can be overwritten with setSizes helper
+ * @object
  */
 const sizeMap = {
   /**
@@ -29,6 +30,7 @@ const sizeMap = {
  * Builds an index of the entry locations in the sizeMap entries
  * <br/>Builds the key value hash of the entries
  * <br/>Builds the keys array of the entries
+ * @function
  *
  * @returns {void}
 */
@@ -56,6 +58,7 @@ const buildSizeMapParts = () => {
  * Updates the sizeMap.entries with custom values
  * <br/>Keys must already exist in the default sizeMap.indexes
  * <br/>Allowed keys are => xsmall | small | medium | large | xlarge
+ * @function
  * @param {Object} dims - key value pair of custom sizeMap.entries
  *
  * @returns {Object} - Updated sizeMap object
@@ -69,7 +72,7 @@ export const setSizes = dims => {
 
   mapObj(dims, (key, value) => {
 
-    // Get the key index form the sizeMap
+    // Get the key index from the sizeMap
     const keyIndex = sizeMap.indexes[key]
 
     // Convert the value to an integer, just a helper incase value is a string
@@ -93,6 +96,7 @@ export const setSizes = dims => {
 
 /**
  * Helper to get the a size from the sizeMap based on the passed in width
+ * @function
  * @param {string|number} width - number to find the size from
  *
  * @returns
@@ -132,6 +136,7 @@ export const getSize = width => {
 
 /**
  * Get an array of all sizes to be merged together
+ * @function
  * @param {string} key - Name of the size
  *
  * @returns {Array} - Array of size key names
@@ -147,8 +152,9 @@ export const getMergeSizes = key => {
 buildSizeMapParts()
 
 /**
- * Get the sizeMap
+ * Get the sizeMap object
+ * @function
  *
- * @returns {void}
+ * @returns {Object} - built sizeMap object
  */
 export const getSizeMap = () => sizeMap
