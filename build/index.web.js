@@ -401,7 +401,9 @@ var withTheme = function withTheme(Component) {
   };
 };
 
-var useTheme = function useTheme() {};
+var useTheme = function useTheme() {
+  return React.useContext(ReThemeContext);
+};
 
 var dims$2 = Dimensions.get("window");
 var ReThemeProvider = function ReThemeProvider(props) {

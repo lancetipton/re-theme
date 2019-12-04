@@ -1,6 +1,11 @@
 export const components = {
-  text: {
-    fontSize: 14,
-    letterSpacing: 0.25,
-  }
+  button: {
+    backgroundColor: '#0b81fc',
+    color: '#fefefe',
+    padding: '12px 16px',
+    cursor: 'pointer',
+    borderRadius: '20px',
+    border: 'none',
+    outline: 'none',
+  },
 }

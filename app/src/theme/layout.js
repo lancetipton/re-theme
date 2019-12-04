@@ -1,7 +1,9 @@
+import { spaceHelper } from './helpers'
+
 // -------- Space styles -------- //
 const paddingSize = 15
 const marginSize = 15
-const padding = {}
+const padding = (amount, sides = []) => spaceHelper(amount, sides, 'padding')
 padding.size = paddingSize
 padding.full = { padding: paddingSize }
 padding.all = padding.full
@@ -12,7 +14,7 @@ padding.hor = { paddingTop: paddingSize, paddingBottom: paddingSize }
 padding.top = { paddingTop: paddingSize }
 padding.bottom = { paddingBottom: paddingSize }
 
-const margin = {}
+const margin = (amount, sides = []) => spaceHelper(amount, sides, 'margin')
 margin.size = marginSize
 margin.full = { margin: marginSize }
 margin.all = margin.full
@@ -68,7 +70,7 @@ const layout = {
       width: '100%',
     },
     height: {
-      height: '100vh',
+      minHeight: '100vh',
       overflowY: 'auto',
       overflowX: 'hidden',
     },

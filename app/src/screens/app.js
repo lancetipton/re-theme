@@ -1,22 +1,13 @@
 import React from 'react'
 import { withTheme } from 're-theme'
 import { get } from 'jsutils'
-import { Container, Text } from '../components'
-
-const UseReTheme = () => {
-  return (
-    <>
-      <Text>
-        Wrap your app with the ReThemeProvider
-      </Text>
-      <Text>
-        <code>
-          { "<ReThemeProvider value={ this.state.theme } ><App /></ReThemeProvider>" }
-        </code>
-      </Text>
-    </>
-  )
-}
+import {
+  Grid,
+  Row,
+  ThemeProviderExample,
+  WithThemeExample,
+  UseThemeExample
+} from '../components'
 
 
 export const AppScreen = withTheme(props => {
@@ -30,9 +21,17 @@ export const AppScreen = withTheme(props => {
   
   return (
     <div style={ appStyle } >
-      <Container>
-        <UseReTheme />
-      </Container>
+      <Grid>
+        <Row>
+          <ThemeProviderExample />
+        </Row>
+        <Row>
+          <WithThemeExample />
+        </Row>
+        <Row>
+          <UseThemeExample />
+        </Row>
+      </Grid>
     </div>
   )
 

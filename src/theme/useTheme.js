@@ -1,13 +1,13 @@
 /** @module theme */
-'use strict'
 
-import React, { useState, useEffect } from "react"
-import { Dimensions } from "ReDimensions"
-import { addThemeEvent, removeThemeEvent } from './themeEvent'
-import { Constants } from '../constants'
-import { buildTheme } from "./buildTheme"
+import React, { useContext } from "react"
+import { ReThemeContext } from '../context/context'
 
+/**
+ * Uses the useContext hook from react to get the current theme ( Value prop of the context )
+ *
+ * @returns { Object } - Current theme
+ */
 export const useTheme = () => {
-
-
+  return useContext(ReThemeContext)
 }
