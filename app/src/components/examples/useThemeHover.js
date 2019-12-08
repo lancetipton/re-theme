@@ -22,7 +22,7 @@ export const UseThemeHoverExample = ({ isToggled }) => (<Example
   codeText={`
     import { useThemeHover, useTheme } from 're-theme'
 
-    export const MyButton = withTheme(props => {
+    export const MyButton = props => {
       const { components: { button } } = useTheme()
       const [ ref, theme ] = useThemeHover(button.default, button.hover)
 
@@ -31,6 +31,6 @@ export const UseThemeHoverExample = ({ isToggled }) => (<Example
           { props.children }
         </button>
       )
-    })
+    }
   `}
 />)
