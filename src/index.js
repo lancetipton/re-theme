@@ -13,8 +13,14 @@ import {
   removeThemeEvent,
   setDefaultTheme,
   withTheme,
-  useTheme,
 } from './theme'
+
+import {
+  useTheme,
+  useThemeActive,
+  useThemeFocus,
+  useThemeHover,
+} from './hooks'
 
 export {
 
@@ -32,8 +38,13 @@ export {
   removeThemeEvent,
   setDefaultTheme,
   withTheme,
+
+  // Theme hooks
   useTheme,
-  
+  useThemeActive,
+  useThemeFocus,
+  useThemeHover,
+
   // Context Exports
   ReThemeContext,
   ReThemeProvider,

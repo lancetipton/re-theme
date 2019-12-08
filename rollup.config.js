@@ -7,7 +7,7 @@ import sourcemaps from 'rollup-plugin-sourcemaps';
 import alias from '@rollup/plugin-alias'
 
 const shared = {
-  external: ['react', 'react-native', 'jsutils' ],
+  external: ['react', 'react-dom', 'react-native', 'jsutils' ],
   watch: {
     clearScreen: false
   },
@@ -38,7 +38,9 @@ export default Array
     plugins: [
       ...shared.plugins,
       alias({
-        entries: { ReDimensions: `src/dimensions/dimensions.${platform}.js` }
+        entries: {
+          ReDimensions: `src/dimensions/dimensions.${platform}.js`
+        }
       })
     ]
   })))

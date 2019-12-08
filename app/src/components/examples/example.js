@@ -5,8 +5,8 @@ import PropTypes from 'prop-types'
 import { ExampleHeader, ExampleCode, ExampleComponent } from '../../components'
 
 export const Example = withTheme(props => {
-  const [ toggled, setToggled ] = useState(false)
-  const { theme } = props
+  const { theme, isToggled } = props
+  const [ toggled, setToggled ] = useState(isToggled || false)
   return (
     <section style={
       theme.join(

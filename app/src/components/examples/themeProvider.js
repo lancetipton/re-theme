@@ -1,7 +1,8 @@
 import React from 'react'
 import { Example } from '../../components'
 
-export const ThemeProviderExample =() => (<Example
+export const ThemeProviderExample =({ isToggled }) => (<Example
+  isToggled={ isToggled }
   headerText={ 'ReThemeProvider' }
   codeText={`
     import { ReThemeProvider } from 're-theme'

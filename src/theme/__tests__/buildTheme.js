@@ -1,4 +1,3 @@
-import { get } from 'jsutils'
 import { testTheme, buttonTheme } from '../../mocks'
 
 const { buildTheme } = require('../buildTheme')

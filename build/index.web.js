@@ -150,7 +150,9 @@ var getWindow = function getWindow() {
 var Constants = jsutils.deepFreeze({
   BUILD_EVENT: 'build',
   CHANGE_EVENT: 'change',
-  RESIZE_EVENT: 'resize'
+  RESIZE_EVENT: 'resize',
+  ADD_EVENT: 'addEventListener',
+  REMOVE_EVENT: 'removeEventListener'
 });
 
 var DEBOUNCE_RATE = 100;
@@ -401,10 +403,6 @@ var withTheme = function withTheme(Component) {
   };
 };
 
-var useTheme = function useTheme() {
-  return React.useContext(ReThemeContext);
-};
-
 var dims$2 = Dimensions.get("window");
 var ReThemeProvider = function ReThemeProvider(props) {
   var children = props.children,
@@ -439,6 +437,73 @@ var ReThemeProvider = function ReThemeProvider(props) {
   }, children);
 };
 
+var useTheme = function useTheme() {
+  return React.useContext(ReThemeContext);
+};
+
+var updateListeners = function updateListeners(element, type, events, methods) {
+  if (!jsutils.isObj(element) || !jsutils.isFunc(element[type])) return null;
+  element[type](events.on, methods.on);
+  element[type](events.off, methods.off);
+};
+var createCBRef = function createCBRef(ref, events, methods) {
+  return React.useCallback(function (element) {
+    ref.current && updateListeners(ref.current, Constants.REMOVE_EVENT, events, methods);
+    ref.current = element;
+    ref.current && updateListeners(ref.current, Constants.ADD_EVENT, events, methods);
+    !ref.current && methods.cleanup();
+  }, [methods.on, methods.off]);
+};
+var createMethods = function createMethods(onValue, offValue, setValue, noJoin) {
+  var methods = {
+    off: React.useCallback(function () {
+      return setValue(offValue);
+    }, [offValue]),
+    on: React.useCallback(function () {
+      noJoin || !jsutils.isColl(onValue) || !jsutils.isColl(offValue) ? setValue(onValue) : setValue(jsutils.deepMerge(offValue, onValue));
+    }, [onValue, noJoin]),
+    cleanup: function cleanup() {
+      methods.on(undefined);
+      methods.off(undefined);
+      onValue = undefined;
+      offValue = undefined;
+      setValue = undefined;
+      methods = undefined;
+    }
+  };
+  return methods;
+};
+var hookFactory = function hookFactory(events) {
+  return (
+    function (offValue, onValue, noJoin) {
+      var _useState = React.useState(offValue),
+          _useState2 = _slicedToArray(_useState, 2),
+          value = _useState2[0],
+          setValue = _useState2[1];
+      var elementRef = createCBRef(
+      React.useRef(),
+      events,
+      createMethods(onValue, offValue, setValue, noJoin));
+      return [elementRef, value];
+    }
+  );
+};
+
+var useThemeHover = hookFactory({
+  on: 'mouseenter',
+  off: 'mouseleave'
+});
+
+var useThemeActive = hookFactory({
+  on: 'mousedown',
+  off: 'mouseup'
+});
+
+var useThemeFocus = hookFactory({
+  on: 'focus',
+  off: 'blur'
+});
+
 exports.ReThemeContext = ReThemeContext;
 exports.ReThemeProvider = ReThemeProvider;
 exports.addThemeEvent = addThemeEvent;
@@ -452,4 +517,7 @@ exports.setDefaultTheme = setDefaultTheme;
 exports.setSizes = setSizes;
 exports.useDimensions = useDimensions;
 exports.useTheme = useTheme;
+exports.useThemeActive = useThemeActive;
+exports.useThemeFocus = useThemeFocus;
+exports.useThemeHover = useThemeHover;
 exports.withTheme = withTheme;

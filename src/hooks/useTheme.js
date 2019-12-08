@@ -1,4 +1,4 @@
-/** @module theme */
+/** @module hooks */
 
 import React, { useContext } from "react"
 import { ReThemeContext } from '../context/context'

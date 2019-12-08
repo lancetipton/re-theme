@@ -5,13 +5,14 @@ import { useTheme } from 're-theme'
 const MyButton = props => {
   const theme = useTheme()
   return (
-    <button style={ theme.components.button } >
+    <button style={ theme.components.button.default } >
       { props.children }
     </button>
   )
 }
 
-export const UseThemeExample = () => (<Example
+export const UseThemeExample = ({ isToggled }) => (<Example
+  isToggled={ isToggled }
   headerText={ 'useTheme Hook' }
   component={ <MyButton>useTheme Button</MyButton> }
   codeText={`
@@ -20,7 +21,7 @@ export const UseThemeExample = () => (<Example
     export const MyButton = props => {
       const theme = useTheme()
       return (
-        <button style={ theme.components.button } >
+        <button style={ theme.components.button.default } >
           { props.children }
         </button>
       )

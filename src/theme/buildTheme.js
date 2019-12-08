@@ -4,7 +4,7 @@
 import { fireThemeEvent } from './themeEvent'
 import { Constants } from '../constants'
 import { getMergeSizes, getSize, getSizeMap } from '../dimensions'
-import { isObj, deepMerge, reduceObj, isEmpty, get, unset } from 'jsutils'
+import { isObj, deepMerge, reduceObj, isEmpty,  unset } from 'jsutils'
 
 /**
  * Searches the theme object for keys that match the passed in size

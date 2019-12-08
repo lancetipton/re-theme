@@ -5,13 +5,14 @@ import { withTheme } from 're-theme'
 const MyButton = withTheme(props => {
   const { theme } = props
   return (
-    <button style={ theme.components.button } >
+    <button style={ theme.components.button.default } >
       { props.children }
     </button>
   )
 })
 
-export const WithThemeExample =() => (<Example
+export const WithThemeExample =({ isToggled }) => (<Example
+  isToggled={ isToggled }
   headerText={ 'withTheme HOC' }
   component={ <MyButton>withTheme Button</MyButton> }
   codeText={`
@@ -20,7 +21,7 @@ export const WithThemeExample =() => (<Example
     export const MyButton = withTheme(props => {
       const { theme } = props
       return (
-        <button style={ theme.components.button } >
+        <button style={ theme.components.button.default } >
           { props.children }
         </button>
       )
