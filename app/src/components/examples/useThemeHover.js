@@ -6,10 +6,10 @@ import { useThemeHover, useTheme } from 're-theme'
 
 const MyButton = props => {
   const { components: { button } } = useTheme()
-  const [ ref, value ] = useThemeHover(button.default, button.hover)
+  const [ ref, theme ] = useThemeHover(button.default, button.hover)
 
   return (
-    <button ref={ ref } style={ value } >
+    <button ref={ ref } style={ theme } >
       { props.children }
     </button>
   )
@@ -22,13 +22,15 @@ export const UseThemeHoverExample = ({ isToggled }) => (<Example
   codeText={`
     import { useThemeHover, useTheme } from 're-theme'
 
-    const { components: { button } } = useTheme()
-    const [ ref, value ] = useThemeHover(button.default, button.hover)
+    export const MyButton = withTheme(props => {
+      const { components: { button } } = useTheme()
+      const [ ref, theme ] = useThemeHover(button.default, button.hover)
 
-    return (
-      <button ref={ ref } style={ value } >
-        { props.children }
-      </button>
-    )
+      return (
+        <button ref={ ref } style={ theme } >
+          { props.children }
+        </button>
+      )
+    })
   `}
 />)
