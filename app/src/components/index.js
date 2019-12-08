@@ -1,3 +1,7 @@
 export * from './examples'
 export * from './layout'
+export * from './themeProvider'
 export * from './typography'
+export * from './useThemeHover'
+export * from './useTheme'
+export * from './withTheme'
