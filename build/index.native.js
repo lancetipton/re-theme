@@ -365,44 +365,69 @@ var updateListeners = function updateListeners(element, type, events, methods) {
   element[type](events.on, methods.on);
   element[type](events.off, methods.off);
 };
-var createCBRef = function createCBRef(ref, events, methods) {
+var createCBRef = function createCBRef(hookRef, events, methods, ref, type) {
   return React.useCallback(function (element) {
-    ref.current && updateListeners(ref.current, Constants.REMOVE_EVENT, events, methods);
-    ref.current = element;
-    ref.current && updateListeners(ref.current, Constants.ADD_EVENT, events, methods);
-    !ref.current && methods.cleanup();
+    hookRef.current && updateListeners(hookRef.current, Constants.REMOVE_EVENT, events, methods);
+    hookRef.current = element;
+    hookRef.current && updateListeners(hookRef.current, Constants.ADD_EVENT, events, methods);
+    !hookRef.current && methods.cleanup();
   }, [methods.on, methods.off]);
 };
-var createMethods = function createMethods(onValue, offValue, setValue, noJoin) {
-  var methods = {
+var createMethods = function createMethods(offValue, onValue, setValue, hookType) {
+  return {
     off: React.useCallback(function () {
       return setValue(offValue);
-    }, [offValue]),
+    }, [onValue, offValue]),
     on: React.useCallback(function () {
-      noJoin || !jsutils.isColl(onValue) || !jsutils.isColl(offValue) ? setValue(onValue) : setValue(jsutils.deepMerge(offValue, onValue));
-    }, [onValue, noJoin]),
-    cleanup: function cleanup() {
-      methods.on(undefined);
-      methods.off(undefined);
+      return setValue(onValue);
+    }, [offValue, onValue]),
+    cleanup: function cleanup(methods) {
+      if (!methods) return;
+      jsutils.isFunc(methods.on) && methods.on(undefined);
+      jsutils.isFunc(methods.off) && methods.off(undefined);
       onValue = undefined;
       offValue = undefined;
       setValue = undefined;
       methods = undefined;
     }
   };
-  return methods;
 };
-var hookFactory = function hookFactory(events) {
+var getOptions = function getOptions() {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  return options && !jsutils.isObj(options) ? {} : options;
+};
+var checkJoinValues = function checkJoinValues(offValue, onValue, valueOn, noJoin) {
+  return noJoin || !jsutils.isColl(onValue) || !jsutils.isColl(offValue) ? valueOn : jsutils.deepMerge(offValue, onValue);
+};
+var hookFactory = function hookFactory(events, hookType) {
   return (
-    function (offValue, onValue, noJoin) {
+    function (offValue, onValue) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var _getOptions = getOptions(options),
+          ref = _getOptions.ref,
+          noJoin = _getOptions.noJoin;
+      var hookRef = ref || React.useRef();
       var _useState = React.useState(offValue),
           _useState2 = _slicedToArray(_useState, 2),
           value = _useState2[0],
           setValue = _useState2[1];
+      var _useState3 = React.useState(checkJoinValues(offValue, onValue, onValue, noJoin)),
+          _useState4 = _slicedToArray(_useState3, 1),
+          activeValue = _useState4[0];
       var elementRef = createCBRef(
-      React.useRef(),
+      hookRef,
       events,
-      createMethods(onValue, offValue, setValue, noJoin));
+      createMethods(offValue, activeValue, setValue));
+      if (jsutils.isFunc(ref)) {
+        var useValue = offValue === value ? value
+        : value === activeValue
+        ? checkJoinValues(offValue, onValue, activeValue, noJoin) : offValue;
+        var wrapRef = function wrapRef(element) {
+          ref(element);
+          elementRef(element);
+        };
+        return [wrapRef, useValue];
+      }
       return [elementRef, value];
     }
   );

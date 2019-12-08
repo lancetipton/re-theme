@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from 'react';
-import { isFunc, isObj, isColl, deepMerge } from 'jsutils'
+import { isFunc, isObj, isColl, deepMerge, isBool } from 'jsutils'
 import { Constants } from '../constants'
 
 /**
@@ -29,22 +29,22 @@ const updateListeners = (element, type, events, methods) => {
  *
  * @returns {React Callback Ref} - Reference to the callback method
  */
-const createCBRef = (ref, events, methods) => {
-  // This keeps track of the ref, and the event listeners on the element
+const createCBRef = (hookRef, events, methods, ref) => {
+  // This keeps track of the hookRef, and the event listeners on the element
   return useCallback(element => {
 
     // Remove any old events if they exist
-    ref.current && updateListeners(ref.current, Constants.REMOVE_EVENT, events, methods)
+    hookRef.current && updateListeners(hookRef.current, Constants.REMOVE_EVENT, events, methods)
 
-    // Set the new element to the ref.current
-    // Because this ref is internal, we have to update current manually
-    ref.current = element
+    // Set the new element to the hookRef.current
+    // Because this hookRef is internal, we have to update current manually
+    hookRef.current = element
 
     // Add the new listeners to the updated element
-    ref.current && updateListeners(ref.current, Constants.ADD_EVENT, events, methods)
+    hookRef.current && updateListeners(hookRef.current, Constants.ADD_EVENT, events, methods)
 
-    // If no ref, then call the clean up method
-    !ref.current && methods.cleanup()
+    // If no hookRef, then call the clean up method
+    !hookRef.current && methods.cleanup()
 
   // Want to update the callback when the methods changes
   // If the values change, then the method will also change
@@ -60,30 +60,25 @@ const createCBRef = (ref, events, methods) => {
  *
  * @returns {Object} - Contains the hooks to update to values on and off
  */
-const createMethods = (onValue, offValue, setValue, noJoin) => {
+const createMethods = (offValue, onValue, setValue) => {
   // These methods get called from createCBRef returned function
   // An event listener is added to the ref.current element
   // And when the event happens, Then either the on || off method is called!
   // When called, it calls the setValue function which updates the state with the passed in value
-  let methods = {
+  return {
     // Pass in the onValue / offValue to ensure it updates when the value changes
     // This will also cause the useCallback create from createCBRef to fire
-    off: useCallback(() => setValue(offValue), [ offValue ]),
-    on: useCallback(() => {
+    off: useCallback(() => setValue(offValue), [ onValue, offValue ]),
 
-      // If no join is set, or the onValue or the offValue is not a collection
-      // Set the value to onValue, otherwise join the objects together
-      noJoin || !isColl(onValue) || !isColl(offValue)
-        ? setValue(onValue)
-        : setValue(deepMerge(offValue, onValue))
-
-    // Watch both the onValue and noJoin value
-    }, [ onValue, noJoin ]),
+    // Watch both the onValue
+    on: useCallback(() => setValue(onValue), [ offValue, onValue ]),
 
     // Clean up helper to avoid memory leaks
-    cleanup: () => {
-      methods.on(undefined)
-      methods.off(undefined)
+    cleanup: methods => {
+      if(!methods) return
+
+      isFunc(methods.on) && methods.on(undefined)
+      isFunc(methods.off) && methods.off(undefined)
       onValue = undefined
       offValue = undefined
       setValue = undefined
@@ -91,8 +86,28 @@ const createMethods = (onValue, offValue, setValue, noJoin) => {
     }
   }
 
-  return methods
 }
+
+const getOptions = (options={}) => (options && !isObj(options) ? {} : options)
+
+
+/**
+ * Checks if the onValue and Off value should be joined
+ *
+ * @param {*} offValue
+ * @param {*} onValue
+ * @param {*} valueOn
+ * @param {*} noJoin
+ * @returns
+ */
+const checkJoinValues = (offValue, onValue, valueOn, noJoin) => {
+  // Need to clean it up to be more clear
+  // Just returning deepMerge(offValue, onValue) works the same
+  return noJoin || !isColl(onValue) || !isColl(offValue)
+    ? valueOn
+    : deepMerge(offValue, onValue)
+}
+
 
 /**
  * Creates a hook that will switch between the passed in values
@@ -101,7 +116,7 @@ const createMethods = (onValue, offValue, setValue, noJoin) => {
  *
  * @returns {function} - Hook function
  */
-export const hookFactory = events => (
+export const hookFactory = (events) => (
   /**
   * Hook function called from within a react component
   * 
@@ -111,25 +126,62 @@ export const hookFactory = events => (
   *
   * @returns {Array} - Contains the ref to be added to an element, and the current value
   */
-  (offValue, onValue, noJoin) => {
+  (offValue, onValue, options={}) => {
+    
+    const { ref, noJoin } = getOptions(options)
 
+    // Get the ref object
+    const hookRef = ref || useRef()
     // Set the default value as off
     const [ value, setValue ] = useState(offValue)
+
+    // Set default joinedOnOff, to allow comparing against later
+    const [ activeValue ] = useState(
+      checkJoinValues(offValue, onValue, onValue, noJoin)
+    )
 
     // Create the callback ref ( i.e. function ref )
     // Which gets the node the ref is attached to as an argument
     const elementRef = createCBRef(
       // Create an internal ref, that keeps track of the current element
       // This way we can remove event listeners when the element changes
-      useRef(),
+      hookRef,
       // Names of events to listen to
       events,
       // Create the methods to update the value using the setValue method
       // These methods call the setValue method, which updates the state
-      createMethods(onValue, offValue, setValue, noJoin)
+      createMethods(offValue, activeValue, setValue),
+      ref
     )
 
-    // Return the ref.current and value to the component
+    // When ref is a function, and there's no change
+    // When value is not equal to off value or updated value,
+    // then we want to return the off value, because that has the updated state from the 
+    // Other refs update
+    if(isFunc(ref)){
+
+      // Get the value to use based on the current state of the values
+      // If the offValue and value are the same then no updated state
+      const useValue = offValue === value
+        ? value
+        // Check if value is equal to the activeValue ( original offValue + onValue merged )
+        : value === activeValue
+          // If value and activeValue are equal, then the State is active either of the refs
+          // The passed in ref or the current ref, so build value to use
+          ? checkJoinValues(offValue, onValue, activeValue, noJoin)
+          : offValue
+
+      // Wrap the callbacks so we can call the passed in ref, and the new ref
+      const wrapRef = (element) => {
+        ref(element)
+        elementRef(element)
+      }
+
+      return [ wrapRef, useValue ]
+
+    }
+
+      // Return the elementRef function and value to the component
     return [ elementRef, value ]
 
   }

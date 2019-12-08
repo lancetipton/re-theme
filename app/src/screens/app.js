@@ -6,8 +6,9 @@ import {
   Row,
   ThemeProviderExample,
   WithThemeExample,
+  UseThemeExample,
+  UseThemeFocusExample,
   UseThemeHoverExample,
-  UseThemeExample
 } from '../components'
 
 
@@ -33,7 +34,10 @@ export const AppScreen = withTheme(props => {
           <UseThemeExample />
         </Row>
         <Row>
-          <UseThemeHoverExample isToggled={ true } />
+          <UseThemeHoverExample />
+        </Row>
+        <Row>
+          <UseThemeFocusExample isToggled={ true } />
         </Row>
       </Grid>
     </div>
