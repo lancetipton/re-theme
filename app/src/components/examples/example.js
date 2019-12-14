@@ -7,24 +7,28 @@ import { ExampleHeader, ExampleCode, ExampleComponent } from '../../components'
 export const Example = withTheme(props => {
   const { theme, isToggled } = props
   const [ toggled, setToggled ] = useState(isToggled || false)
+
+  const sectionStyle = theme.join(
+    get(theme, 'example.section'),
+    get(theme, 'margin.bottom'),
+    props.style
+  )
+
+  const wrapStyle = theme.join(
+    get(theme, 'example.wrapper'),
+    { maxHeight: (toggled && '700px') || '0px' },
+  )
+  
   return (
-    <section style={
-      theme.join(
-        get(theme, 'example.section'),
-        get(theme, 'margin.bottom'),
-        theme.example.section,
-        props.style
-      )
-    }>
+    <section style={ sectionStyle }>
       { props.headerText && (
         <ExampleHeader text={ props.headerText } toggled={toggled} setToggled={setToggled} />
       )}
-      { toggled && (
-        <div style={ theme.padding(30, [ 'left', 'right', 'bottom' ]) } >
-          { props.codeText && ( <ExampleCode text={ props.codeText } /> )}
-          { props.component && ( <ExampleComponent component={ props.component } /> )}
-        </div>
-      )}
+
+      <div style={ wrapStyle } >
+        { props.codeText && ( <ExampleCode text={ props.codeText } /> )}
+        { props.component && ( <ExampleComponent component={ props.component } /> )}
+      </div>
     </section>
   )
 })

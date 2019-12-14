@@ -1,5 +1,3 @@
-// useThemeHover
-
 import React from 'react'
 import { Example } from '../../components'
 import { useThemeHover, useTheme } from 're-theme'
@@ -17,7 +15,7 @@ const MyButton = props => {
 
 export const UseThemeHoverExample = ({ isToggled }) => (<Example
   isToggled={ isToggled }
-  headerText={ 'useThemeHover Hook' }
+  headerText={ 'useThemeHover' }
   component={ <MyButton>useThemeHover Button</MyButton> }
   codeText={`
     import { useThemeHover, useTheme } from 're-theme'

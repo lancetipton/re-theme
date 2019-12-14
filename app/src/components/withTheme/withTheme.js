@@ -13,7 +13,7 @@ const MyButton = withTheme(props => {
 
 export const WithThemeExample =({ isToggled }) => (<Example
   isToggled={ isToggled }
-  headerText={ 'withTheme HOC' }
+  headerText={ 'withTheme' }
   component={ <MyButton>withTheme Button</MyButton> }
   codeText={`
     import { withTheme } from 're-theme'

@@ -13,7 +13,7 @@ const MyButton = props => {
 
 export const UseThemeExample = ({ isToggled }) => (<Example
   isToggled={ isToggled }
-  headerText={ 'useTheme Hook' }
+  headerText={ 'useTheme' }
   component={ <MyButton>useTheme Button</MyButton> }
   codeText={`
     import { useTheme } from 're-theme'

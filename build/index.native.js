@@ -365,7 +365,7 @@ var updateListeners = function updateListeners(element, type, events, methods) {
   element[type](events.on, methods.on);
   element[type](events.off, methods.off);
 };
-var createCBRef = function createCBRef(hookRef, events, methods, ref, type) {
+var createCBRef = function createCBRef(hookRef, events, methods, ref) {
   return React.useCallback(function (element) {
     hookRef.current && updateListeners(hookRef.current, Constants.REMOVE_EVENT, events, methods);
     hookRef.current = element;
@@ -373,7 +373,7 @@ var createCBRef = function createCBRef(hookRef, events, methods, ref, type) {
     !hookRef.current && methods.cleanup();
   }, [methods.on, methods.off]);
 };
-var createMethods = function createMethods(offValue, onValue, setValue, hookType) {
+var createMethods = function createMethods(offValue, onValue, setValue) {
   return {
     off: React.useCallback(function () {
       return setValue(offValue);
@@ -399,7 +399,7 @@ var getOptions = function getOptions() {
 var checkJoinValues = function checkJoinValues(offValue, onValue, valueOn, noJoin) {
   return noJoin || !jsutils.isColl(onValue) || !jsutils.isColl(offValue) ? valueOn : jsutils.deepMerge(offValue, onValue);
 };
-var hookFactory = function hookFactory(events, hookType) {
+var hookFactory = function hookFactory(events) {
   return (
     function (offValue, onValue) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};

@@ -1,13 +1,13 @@
 import React from 'react'
 import { Example } from '../../components'
 import { deepMerge } from 'jsutils'
-import { useThemeFocus, useTheme } from 're-theme'
+import { useThemeActive, useTheme } from 're-theme'
 
 const Input = props => {
   const { components: { customInput } } = useTheme()
 
   const focusInput = deepMerge(customInput.hover, customInput.focus)
-  const [ ref, theme ] = useThemeFocus(customInput.default, focusInput)
+  const [ ref, theme ] = useThemeActive(customInput.default, focusInput)
 
   return (
     <label htmlFor="customInput" style={ theme.label }  >
@@ -18,18 +18,18 @@ const Input = props => {
   )
 }
 
-export const UseThemeFocusExample = ({ isToggled }) => (<Example
+export const UseThemeActiveExample = ({ isToggled }) => (<Example
   isToggled={ isToggled }
-  headerText={ 'useThemeFocus' }
-  component={ <Input title={ 'useThemeFocus Input' } ></Input> }
+  headerText={ 'useThemeActive' }
+  component={ <Input title={ 'useThemeActive Input' } ></Input> }
   codeText={`
-    import { useThemeFocus, useTheme } from 're-theme'
+    import { useThemeActive, useTheme } from 're-theme'
 
     export const Input = props => {
       const { components: { customInput } } = useTheme()
 
       const focusInput = deepMerge(customInput.hover, customInput.focus)
-      const [ ref, theme ] = useThemeFocus(customInput.default, focusInput)
+      const [ ref, theme ] = useThemeActive(customInput.default, focusInput)
 
       return (
         <label htmlFor="customInput" style={ theme.label }  >
