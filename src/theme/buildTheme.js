@@ -67,15 +67,16 @@ const buildSizedThemes = (theme, sizedTheme, size) => {
  */
 const buildSizedTheme = theme => {
 
-  // Loop over the size map keys
-  return getSizeMap().keys.reduce((themeSized, size) => {
-    // Transverse through the theme to find any size objects matching this size
-    const builtSize = buildSizedThemes(theme, theme[size] || {}, size)
-    // If builtSize is not empty, then size data was found, so set it to the themeSized object
-    if(!isEmpty(builtSize)) themeSized[size] = builtSize
+  // Loop over the size map hash keys
+  return Object.keys(getSizeMap().hash)
+    .reduce((themeSized, size) => {
+      // Transverse through the theme to find any size objects matching this size
+      const builtSize = buildSizedThemes(theme, theme[size] || {}, size)
+      // If builtSize is not empty, then size data was found, so set it to the themeSized object
+      if(!isEmpty(builtSize)) themeSized[size] = builtSize
 
-    return themeSized
-  }, theme)
+      return themeSized
+    }, theme)
 
 }
 
@@ -95,7 +96,7 @@ const mergeWithDefault = (theme, defaultTheme) => {
     : theme
 
   // Build the sizes for the merged theme based on the sizeMap keys
-  return buildSizedTheme(mergedTheme, getSizeMap().keys)
+  return buildSizedTheme(mergedTheme)
 }
 
 /**

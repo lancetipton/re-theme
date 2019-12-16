@@ -160,24 +160,23 @@ var Constants = jsutils.deepFreeze({
 var sizeMap = {
   entries: [['xsmall', 1], ['small', 320], ['medium', 768], ['large', 1024], ['xlarge', 1366]],
   hash: {},
-  indexes: {},
-  keys: []
+  indexes: {}
 };
 var buildSizeMapParts = function buildSizeMapParts() {
   sizeMap.indexes = sizeMap.entries.reduce(function (indexes, entry, index) {
     indexes[entry[0]] = index;
     indexes[index] = entry[0];
     sizeMap.hash[entry[0]] = entry[1];
-    sizeMap.keys.push(entry[0]);
     return indexes;
   }, {});
 };
 var setSizes = function setSizes(dims) {
-  if (!jsutils.isObj(dims)) return console.error("setDimensions method requires an argument of type 'Object'.\nReceived: ", dims);
+  if (!jsutils.isObj(dims)) return jsutils.logData("setDimensions method requires an argument of type 'Object'.\nReceived: ", dims, 'error');
   jsutils.mapObj(dims, function (key, value) {
     var keyIndex = sizeMap.indexes[key];
+    if (!jsutils.softFalsy(keyIndex)) return jsutils.logData("Invalid ".concat(key, " for theme size! Allowed keys are xsmall | small | medium | large | xlarge"), 'warn');
     var newSize = jsutils.toNum(dims[key]);
-    if (!keyIndex || !newSize || !sizeMap.entries[keyIndex]) return;
+    if (!newSize || !sizeMap.entries[keyIndex]) return jsutils.logData("Invalid size entry. Size must be a number and the size entry must exist!", "Size: ".concat(newSize), "Entry: ".concat(sizeMap.entries[keyIndex]), 'warn');
     sizeMap.entries[keyIndex] = [key, newSize];
   });
   buildSizeMapParts();
@@ -189,12 +188,10 @@ var getSize = function getSize(width) {
     var _ref2 = _slicedToArray(_ref, 2),
         key = _ref2[0],
         value = _ref2[1];
-    if (checkWidth <= value) return updateSize;
-    value <= checkWidth
+    checkWidth >= value
     ? updateSize
     ? value > sizeMap.hash[updateSize] && (updateSize = key)
-    : updateSize = key
-    : null;
+    : updateSize = key : null;
     return updateSize;
   }, 'xsmall');
   return [name, sizeMap.hash[name]];
@@ -255,7 +252,7 @@ var buildSizedThemes = function buildSizedThemes(theme, sizedTheme, size) {
   }, sizedTheme);
 };
 var buildSizedTheme = function buildSizedTheme(theme) {
-  return getSizeMap().keys.reduce(function (themeSized, size) {
+  return Object.keys(getSizeMap().hash).reduce(function (themeSized, size) {
     var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
     if (!jsutils.isEmpty(builtSize)) themeSized[size] = builtSize;
     return themeSized;

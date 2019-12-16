@@ -1,7 +1,7 @@
 /** @module dimensions */
 'use strict'
 
-import { mapObj, isObj, toNum, isNum } from 'jsutils'
+import { mapObj, isObj, toNum, isNum, softFalsy, logData } from 'jsutils'
 
 /**
  * Default sizes for a screen width
@@ -22,8 +22,7 @@ const sizeMap = {
     [ 'xlarge', 1366 ]
   ],
   hash: {},
-  indexes: {},
-  keys: [],
+  indexes: {}
 }
 
 /**
@@ -46,9 +45,6 @@ const buildSizeMapParts = () => {
     // Convert the sizeMap.entries into an object of key value pairs
     sizeMap.hash[ entry[0] ] = entry[1]
 
-    // Build the keys while building the indexes
-    sizeMap.keys.push(entry[0])
-
     return indexes
   }, {})
 }
@@ -65,9 +61,10 @@ const buildSizeMapParts = () => {
  */
 export const setSizes = dims => {
   if(!isObj(dims))
-    return console.error(
+    return logData(
       `setDimensions method requires an argument of type 'Object'.\nReceived: `,
-      dims
+      dims,
+      'error'
     )
 
   mapObj(dims, (key, value) => {
@@ -75,13 +72,25 @@ export const setSizes = dims => {
     // Get the key index from the sizeMap
     const keyIndex = sizeMap.indexes[key]
 
+    if(!softFalsy(keyIndex))
+      return logData(
+        `Invalid ${key} for theme size! Allowed keys are xsmall | small | medium | large | xlarge`,
+        'warn'
+      )
+
     // Convert the value to an integer, just a helper incase value is a string
     const newSize = toNum(dims[key])
 
     // Ensure key is a valid key in the sizeMap indexes and the new size is a valid number
     // Also ensure the entry exists based on the keyIndex
     //  * This should never happen, but just incase
-    if(!keyIndex || !newSize || !sizeMap.entries[keyIndex]) return
+    if(!newSize || !sizeMap.entries[keyIndex])
+      return logData(
+        `Invalid size entry. Size must be a number and the size entry must exist!`,
+        `Size: ${newSize}`,
+        `Entry: ${sizeMap.entries[keyIndex]}`,
+        'warn'
+      )
 
     // Use the keyIndex to find the entry
     // Set the value to be an entry with key and new size
@@ -107,23 +116,14 @@ export const getSize = width => {
 
   const name = sizeMap.entries
     .reduce((updateSize, [ key, value ]) => {
-      
-      // If the checkWidth if more then or equal, just return the updates size
-      if(checkWidth <= value) return updateSize
 
-      // Check if the value is less then the checkWidth
-      value <= checkWidth
+      checkWidth >= value
         // If it is check if there is an updateSize already sent
         ? updateSize
-
           // If an update size exists, then check if it's value is less then value
-          // If it is, update the size
           ? value > sizeMap.hash[updateSize] && (updateSize = key)
-
           // Otherwise just update the size
           : (updateSize = key)
-
-        // If value not less then the check width, just bypass with null
         : null
 
       return updateSize
