@@ -14,13 +14,24 @@ import {
   UseThemeHoverExample,
 } from '../components'
 
+const buildGridHeader = (title, gridStyle, iconStyle) => {
+  return (
+    <H2 style={ gridStyle } >
+      { title }
+    </H2>
+  )
+}
+
+
 const BuildGrid = ({ children, style, theme, title }) => {
   
   children = children && ((isArr(children) && children) || [ children ])
+  const titleStyle = get(theme, 'example.grid.title')
+  const iconStyle = get(theme, 'app.icons.header.grid')
 
   return (
     <Grid style={ style } >
-      { title && (<H2 style={ get(theme, 'example.grid.title') } >{ title }</H2>) }
+      { title && buildGridHeader(title, titleStyle, iconStyle) }
       { children && children.map((child, index) => (
         <Row key={ index } >
           { child }
