@@ -2,35 +2,33 @@ import React, { useState } from 'react'
 import { withTheme } from 're-theme'
 import { get } from 'jsutils'
 import PropTypes from 'prop-types'
-import { ExampleHeader, ExampleCode, ExampleComponent } from '../../components'
+import { ExampleCode, ExampleComponent, ExampleHeader, Slider } from '../../components'
 
 export const Example = withTheme(props => {
-  const { theme, isToggled } = props
+
+  const { theme, isToggled, headerText } = props
   const [ toggled, setToggled ] = useState(isToggled || false)
 
   const sectionStyle = theme.join(
-    get(theme, 'example.section'),
+    get(theme, 'app.section'),
     get(theme, 'margin.bottom'),
     props.style
   )
 
-  const wrapStyle = theme.join(
-    get(theme, 'example.wrapper'),
-    { maxHeight: (toggled && '700px') || '0px' },
-  )
-  
   return (
     <section style={ sectionStyle }>
       { props.headerText && (
-        <ExampleHeader text={ props.headerText } toggled={toggled} setToggled={setToggled} />
+        <ExampleHeader text={ headerText } toggled={toggled} setToggled={setToggled} />
       )}
-
-      <div style={ wrapStyle } >
-        { props.codeText && ( <ExampleCode text={ props.codeText } /> )}
-        { props.component && ( <ExampleComponent component={ props.component } /> )}
-      </div>
+      <Slider style={ get(theme, 'app.wrapper') } toggled={ toggled } >
+        <div style={ get(theme, 'padding.bottom') } >
+          { props.codeText && ( <ExampleCode text={ props.codeText } /> )}
+          { props.component && ( <ExampleComponent component={ props.component } /> )}
+        </div>
+      </Slider>
     </section>
   )
+
 })
 
 Example.propTypes = {

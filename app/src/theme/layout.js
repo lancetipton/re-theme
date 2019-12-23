@@ -75,6 +75,11 @@ const layout = {
       overflowX: 'hidden',
     },
   },
+  float: {
+    left: { float: 'left' },
+    right: { float: 'right' },
+    none: { float: 'none' },
+  }
 }
 
 export { flex, layout, margin, padding, padding as pad }

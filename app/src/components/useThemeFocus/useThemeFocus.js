@@ -10,8 +10,8 @@ const Input = props => {
   const [ ref, theme ] = useThemeFocus(customInput.default, focusInput)
 
   return (
-    <label htmlFor="customInput" style={ theme.label }  >
-      <input ref={ ref } type="text" id="customInput" placeholder="&nbsp;" style={ theme.input }  />
+    <label htmlFor="focusInput" style={ theme.label }  >
+      <input ref={ ref } type="text" id="focusInput" placeholder="&nbsp;" style={ theme.input }  />
       <span style={ theme.spanText } >Label</span>
       <span style={ theme.spanBorder } ></span>
     </label>

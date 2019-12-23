@@ -1,11 +1,9 @@
 import React from 'react'
 import { withTheme } from 're-theme'
-import { get, isArr } from 'jsutils'
+import { get } from 'jsutils'
 import {
-  Grid,
-  H2,
-  Row,
   ReuseRefExample,
+  Section,
   ThemeProviderExample,
   WithThemeExample,
   UseThemeExample,
@@ -13,33 +11,6 @@ import {
   UseThemeFocusExample,
   UseThemeHoverExample,
 } from '../components'
-
-const buildGridHeader = (title, gridStyle, iconStyle) => {
-  return (
-    <H2 style={ gridStyle } >
-      { title }
-    </H2>
-  )
-}
-
-
-const BuildGrid = ({ children, style, theme, title }) => {
-  
-  children = children && ((isArr(children) && children) || [ children ])
-  const titleStyle = get(theme, 'example.grid.title')
-  const iconStyle = get(theme, 'app.icons.header.grid')
-
-  return (
-    <Grid style={ style } >
-      { title && buildGridHeader(title, titleStyle, iconStyle) }
-      { children && children.map((child, index) => (
-        <Row key={ index } >
-          { child }
-        </Row>
-      )) }
-    </Grid>
-  )
-}
 
 export const AppScreen = withTheme(props => {
   
@@ -56,27 +27,23 @@ export const AppScreen = withTheme(props => {
 
   return (
     <div style={ appStyle } >
-      <BuildGrid style={ gridStyle } title={ 'Provider' } theme={ theme } >
+
+      <Section style={ gridStyle } title={ 'Provider' } theme={ theme } >
         <ThemeProviderExample />
-      </BuildGrid>
-      <BuildGrid style={ gridStyle } title={ 'HOC' } theme={ theme } >
+      </Section>
+
+      <Section style={ gridStyle } title={ 'HOC' } theme={ theme } >
         <WithThemeExample />
-      </BuildGrid>
-      <BuildGrid style={ gridStyle } title={ 'Hooks' } theme={ theme } >
+      </Section>
+
+      <Section style={ gridStyle } title={ 'Hooks' } theme={ theme } >
         <UseThemeExample />
-      </BuildGrid>
-      <BuildGrid style={ gridStyle }>
         <UseThemeHoverExample />
-      </BuildGrid>
-      <BuildGrid style={ gridStyle }>
         <UseThemeActiveExample />
-      </BuildGrid>
-      <BuildGrid style={ gridStyle }>
         <UseThemeFocusExample />
-      </BuildGrid>
-      <BuildGrid style={ gridStyle }>
         <ReuseRefExample />
-      </BuildGrid>
+      </Section>
+
     </div>
   )
 
