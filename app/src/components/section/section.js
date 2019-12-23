@@ -7,10 +7,10 @@ import {
   Slider
 } from '../../components'
 
-export const Section = ({ children, style, theme, title }) => {
+export const Section = ({ children, toggled, style, theme, title, }) => {
   
   children = children && ((isArr(children) && children) || [ children ])
-  const [ isToggled, setToggled ] = useState(false)
+  const [ isToggled, setToggled ] = useState(toggled || false)
 
   return (
     <Grid style={ style } >

@@ -2,7 +2,13 @@ import React, { useState } from 'react'
 import { withTheme } from 're-theme'
 import { get } from 'jsutils'
 import PropTypes from 'prop-types'
-import { ExampleCode, ExampleComponent, ExampleHeader, Slider } from '../../components'
+import {
+  ExampleCode,
+  ExampleComponent,
+  ExampleHeader,
+  ExampleProps,
+  Slider
+} from '../../components'
 
 export const Example = withTheme(props => {
 
@@ -21,9 +27,15 @@ export const Example = withTheme(props => {
         <ExampleHeader text={ headerText } toggled={toggled} setToggled={setToggled} />
       )}
       <Slider style={ get(theme, 'app.example.wrapper') } toggled={ toggled } >
+        <span>
+          { props.description }
+        </span>
         <div style={ get(theme, 'padding.bottom') } >
           { props.codeText && ( <ExampleCode text={ props.codeText } /> )}
           { props.component && ( <ExampleComponent component={ props.component } /> )}
+          { props.allowedProps && props.allowedProps.length && (
+            <ExampleProps allowed={ props.allowedProps } />
+          )}
         </div>
       </Slider>
     </section>

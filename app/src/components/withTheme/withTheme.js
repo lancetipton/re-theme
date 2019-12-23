@@ -1,30 +1,20 @@
 import React from 'react'
 import { Example } from '../../components'
-import { withTheme } from 're-theme'
+import { WithThemeButton } from './withThemeButton'
 
-const MyButton = withTheme(props => {
-  const { theme } = props
-  return (
-    <button style={ theme.components.button.default } >
-      { props.children }
-    </button>
-  )
-})
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import WithThemeButtonTxt from '!!raw-loader!./withThemeButton.js'
 
-export const WithThemeExample =({ isToggled }) => (<Example
-  isToggled={ isToggled }
+const description = (
+  <p>
+    Wrap your components in the <b>withTheme</b> <a href="https://reactjs.org/docs/higher-order-components.html" >HOC (Higher Order Component)</a> to add the app theme to the components props. Uses the <a href="https://reactjs.org/docs/context.html" >React Context API</a> under the hood.
+  </p>
+)
+
+export const WithThemeExample =({ toggled }) => (<Example
+  isToggled={ toggled }
+  description={ description }
   headerText={ 'withTheme' }
-  component={ <MyButton>withTheme Button</MyButton> }
-  codeText={`
-    import { withTheme } from 're-theme'
-
-    export const MyButton = withTheme(props => {
-      const { theme } = props
-      return (
-        <button style={ theme.components.button.default } >
-          { props.children }
-        </button>
-      )
-    })
-  `}
+  component={ <WithThemeButton>withTheme Button</WithThemeButton> }
+  codeText={ WithThemeButtonTxt }
 />)

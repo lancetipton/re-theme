@@ -32,5 +32,22 @@ export const app = {
       maxHeight: 0,
       width: 'auto'
     },
+    grid: {
+      container: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr 3fr',
+        border: '1px solid #cccccc',
+        borderLeft: 'none',
+      },
+      header: {
+        backgroundColor: '#e5ecea',
+        borderTop: 'none',
+      },
+      prop: {
+        padding: '8px 5px',
+        borderTop: '1px solid #cccccc',
+        borderLeft: '1px solid #cccccc',
+      }
+    }
   }
 }
