@@ -1,34 +1,13 @@
 import React from 'react'
 import { Example } from '../../components'
-import { useThemeHover, useTheme } from 're-theme'
+import { UseThemeHoverButton } from './useThemeHoverButton'
 
-const MyButton = props => {
-  const { components: { button } } = useTheme()
-  const [ ref, theme ] = useThemeHover(button.default, button.hover)
-
-  return (
-    <button ref={ ref } style={ theme } >
-      { props.children }
-    </button>
-  )
-}
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import UseThemeHoverButtonTxt from '!!raw-loader!./useThemeHoverButton.js'
 
 export const UseThemeHoverExample = ({ isToggled }) => (<Example
   isToggled={ isToggled }
   headerText={ 'useThemeHover' }
-  component={ <MyButton>useThemeHover Button</MyButton> }
-  codeText={`
-    import { useThemeHover, useTheme } from 're-theme'
-
-    export const MyButton = props => {
-      const { components: { button } } = useTheme()
-      const [ ref, theme ] = useThemeHover(button.default, button.hover)
-
-      return (
-        <button ref={ ref } style={ theme } >
-          { props.children }
-        </button>
-      )
-    }
-  `}
+  component={ <UseThemeHoverButton>useThemeHover Button</UseThemeHoverButton> }
+  codeText={ UseThemeHoverButtonTxt }
 />)

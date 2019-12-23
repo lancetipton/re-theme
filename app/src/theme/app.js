@@ -25,9 +25,12 @@ export const app = {
     }
   },
   section: {},
-  wrapper: {
-    paddingLeft: 30,
-    paddingRight: 30,
-    maxHeight: 0,
+  example: {
+    wrapper: {
+      paddingLeft: 30,
+      paddingRight: 30,
+      maxHeight: 0,
+      width: 'auto'
+    },
   }
 }

@@ -20,7 +20,7 @@ export const Example = withTheme(props => {
       { props.headerText && (
         <ExampleHeader text={ headerText } toggled={toggled} setToggled={setToggled} />
       )}
-      <Slider style={ get(theme, 'app.wrapper') } toggled={ toggled } >
+      <Slider style={ get(theme, 'app.example.wrapper') } toggled={ toggled } >
         <div style={ get(theme, 'padding.bottom') } >
           { props.codeText && ( <ExampleCode text={ props.codeText } /> )}
           { props.component && ( <ExampleComponent component={ props.component } /> )}

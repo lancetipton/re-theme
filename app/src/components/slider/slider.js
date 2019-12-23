@@ -33,7 +33,7 @@ export const Slider = props => {
   )
 
   return (
-    <div ref={ slideRef } style={ sliderStyle } slider-wrapper='true' >
+    <div ref={ slideRef } style={ sliderStyle } >
       { props.children }
     </div>
   )

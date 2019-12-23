@@ -1,30 +1,13 @@
 import React from 'react'
 import { Example } from '../../components'
-import { useTheme } from 're-theme'
+import { UseThemeButton } from './useThemeButton'
 
-const MyButton = props => {
-  const theme = useTheme()
-  return (
-    <button style={ theme.components.button.default } >
-      { props.children }
-    </button>
-  )
-}
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import UseThemeButtonTxt from '!!raw-loader!./useThemeButton.js'
 
 export const UseThemeExample = ({ isToggled }) => (<Example
   isToggled={ isToggled }
   headerText={ 'useTheme' }
-  component={ <MyButton>useTheme Button</MyButton> }
-  codeText={`
-    import { useTheme } from 're-theme'
-
-    export const MyButton = props => {
-      const theme = useTheme()
-      return (
-        <button style={ theme.components.button.default } >
-          { props.children }
-        </button>
-      )
-    }
-  `}
+  component={ <UseThemeButton>useTheme Button</UseThemeButton> }
+  codeText={ UseThemeButtonTxt }
 />)
