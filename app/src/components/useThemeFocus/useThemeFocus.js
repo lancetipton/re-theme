@@ -17,5 +17,37 @@ export const UseThemeFocusExample = ({ toggled }) => (<Example
   headerText={ 'useThemeFocus' }
   description={ description }
   component={ <UseThemeFocusInput title={ 'useThemeFocus Input' } /> }
-  codeText={UseThemeFocusInputTxt}
+  codeText={ UseThemeFocusInputTxt }
+  allowedArgs={[
+    {
+      type: 'object',
+      key: 'Default Style',
+      description: <span>Default style to use when <b>NOT</b> in a focus state.</span>,
+      default: '{}'
+    },
+    {
+      type: 'object',
+      key: 'Focus Style',
+      description: 'Active Style to use when in a focus state',
+      default: '{}'
+    },
+    {
+      type: 'object',
+      key: 'Options',
+      description: 'Options object to change how the hook handles toggling between default and focus styles.',
+      default: '{}'
+    },
+    {
+      type: 'object',
+      key: 'Options.ref',
+      description: 'Allows passing in a ref returned an other hook. This allows styles to change for multiple states.',
+      default: 'undefined'
+    },
+    {
+      type: 'object',
+      key: 'Options.noMerge',
+      description: 'When the focus state is true, the default and focus styles will be merged, with the focus styles overriding the default styles. This is inline with how css works normally. To disable this, set the option to true.',
+      default: 'undefined'
+    },
+  ]}
 />)

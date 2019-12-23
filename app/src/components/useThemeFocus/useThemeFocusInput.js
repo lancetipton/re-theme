@@ -11,7 +11,7 @@ export const UseThemeFocusInput = props => {
   return (
     <label htmlFor="focusInput" style={ theme.label }  >
       <input ref={ ref } type="text" id="focusInput" placeholder="&nbsp;" style={ theme.input }  />
-      <span style={ theme.spanText } >Label</span>
+      <span style={ theme.spanText } >Focus Label</span>
       <span style={ theme.spanBorder } ></span>
     </label>
   )

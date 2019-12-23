@@ -393,8 +393,8 @@ var getOptions = function getOptions() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   return options && !jsutils.isObj(options) ? {} : options;
 };
-var checkJoinValues = function checkJoinValues(offValue, onValue, valueOn, noJoin) {
-  return noJoin || !jsutils.isColl(onValue) || !jsutils.isColl(offValue) ? valueOn : jsutils.deepMerge(offValue, onValue);
+var checkJoinValues = function checkJoinValues(offValue, onValue, valueOn, noMerge) {
+  return noMerge || !jsutils.isColl(onValue) || !jsutils.isColl(offValue) ? valueOn : jsutils.deepMerge(offValue, onValue);
 };
 var hookFactory = function hookFactory(events) {
   return (
@@ -402,13 +402,13 @@ var hookFactory = function hookFactory(events) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
       var _getOptions = getOptions(options),
           ref = _getOptions.ref,
-          noJoin = _getOptions.noJoin;
+          noMerge = _getOptions.noMerge;
       var hookRef = ref || React.useRef();
       var _useState = React.useState(offValue),
           _useState2 = _slicedToArray(_useState, 2),
           value = _useState2[0],
           setValue = _useState2[1];
-      var _useState3 = React.useState(checkJoinValues(offValue, onValue, onValue, noJoin)),
+      var _useState3 = React.useState(checkJoinValues(offValue, onValue, onValue, noMerge)),
           _useState4 = _slicedToArray(_useState3, 1),
           activeValue = _useState4[0];
       var elementRef = createCBRef(
@@ -418,7 +418,7 @@ var hookFactory = function hookFactory(events) {
       if (jsutils.isFunc(ref)) {
         var useValue = offValue === value ? value
         : value === activeValue
-        ? checkJoinValues(offValue, onValue, activeValue, noJoin) : offValue;
+        ? checkJoinValues(offValue, onValue, activeValue, noMerge) : offValue;
         var wrapRef = function wrapRef(element) {
           ref(element);
           elementRef(element);

@@ -36,6 +36,9 @@ export const Example = withTheme(props => {
           { props.allowedProps && props.allowedProps.length && (
             <ExampleProps allowed={ props.allowedProps } />
           )}
+          { props.allowedArgs && props.allowedArgs.length && (
+            <ExampleProps allowed={ props.allowedArgs } title={ 'Arguments' } />
+          )}
         </div>
       </Slider>
     </section>

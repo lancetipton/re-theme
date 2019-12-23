@@ -1,42 +1,19 @@
 import React from 'react'
 import { Example } from '../../components'
-import { useThemeFocus, useThemeHover, useTheme } from 're-theme'
+import { ReuseRefInput } from './reuseRefInput'
 
-const Input = props => {
-  const { components: { customInput } } = useTheme()
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import ReuseRefInputTxt from '!!raw-loader!./reuseRefInput.js'
 
-  const [ hoverRef, themeWithHover ] = useThemeHover(customInput.default, customInput.hover)
-  const [ ref, theme ] = useThemeFocus(themeWithHover, customInput.focus, { ref: hoverRef })
-
-  return (
-    <label htmlFor="reuseInput" style={ theme.label }  >
-      <input ref={ ref } type="text" id="reuseInput" placeholder="&nbsp;" style={ theme.input }  />
-      <span style={ theme.spanText } >Hover and Focus</span>
-      <span style={ theme.spanBorder } ></span>
-    </label>
-  )
-}
+const description = (
+  <p>
+    There may be times, when styles need to change for multiple states. To allow this, pass in the ref and style object returned from one hook, into another. Use the options argument for the ref.
+  </p>
+)
 
 export const ReuseRefExample = ({ isToggled }) => (<Example
   isToggled={ isToggled }
-  headerText={ 'Reuse Ref' }
-  component={ <Input title={ 'useThemeFocus Input' } ></Input> }
-  codeText={`
-    import { useThemeFocus, useThemeHover, useTheme } from 're-theme'
-
-    const Input = props => {
-      const { components: { customInput } } = useTheme()
-
-      const [ hoverRef, themeWithHover ] = useThemeHover(customInput.default, customInput.hover)
-      const [ ref, theme ] = useThemeFocus(themeWithHover, customInput.focus, { ref: hoverRef })
-
-      return (
-        <label htmlFor="customInput" style={ theme.label }  >
-          <input ref={ ref } type="text" id="customInput" placeholder="&nbsp;" style={ theme.input }  />
-          <span style={ theme.spanText } >Hover and Focus</span>
-          <span style={ theme.spanBorder } ></span>
-        </label>
-      )
-    }
-  `}
+  headerText={ 'Reuse Hook Ref' }
+  component={ <ReuseRefInput title={ 'Reuse Hook Ref Input' } />}
+  codeText={ ReuseRefInputTxt }
 />)

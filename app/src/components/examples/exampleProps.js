@@ -46,14 +46,15 @@ const buildHeader = style => {
   )
 }
 
-export const ExampleProps = ({ allowed }) => {
+export const ExampleProps = ({ allowed, title }) => {
+  title = title || 'Props'
   const theme = useTheme()
   const propStyle = get(theme, 'app.example.grid.prop')
   const headerStyle = get(theme, 'app.example.grid.header')
-  
+
   return (
     <>
-      <H5>Props</H5>
+      <H5>{ title }</H5>
       <div style={ get(theme, 'app.example.grid.container') } >
         { buildHeader(theme.join(propStyle, headerStyle)) }
         { allowed.map(prop => buildProp(prop, propStyle))}

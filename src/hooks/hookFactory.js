@@ -97,13 +97,13 @@ const getOptions = (options={}) => (options && !isObj(options) ? {} : options)
  * @param {*} offValue
  * @param {*} onValue
  * @param {*} valueOn
- * @param {*} noJoin
+ * @param {*} noMerge
  * @returns
  */
-const checkJoinValues = (offValue, onValue, valueOn, noJoin) => {
+const checkJoinValues = (offValue, onValue, valueOn, noMerge) => {
   // Need to clean it up to be more clear
   // Just returning deepMerge(offValue, onValue) works the same
-  return noJoin || !isColl(onValue) || !isColl(offValue)
+  return noMerge || !isColl(onValue) || !isColl(offValue)
     ? valueOn
     : deepMerge(offValue, onValue)
 }
@@ -122,13 +122,13 @@ export const hookFactory = (events) => (
   * 
   * @param {Any} offValue - Value to set when not active
   * @param {Any} onValue - Value to set when active
-  * @param {boolean} noJoin - 
+  * @param {boolean} noMerge - 
   *
   * @returns {Array} - Contains the ref to be added to an element, and the current value
   */
   (offValue, onValue, options={}) => {
     
-    const { ref, noJoin } = getOptions(options)
+    const { ref, noMerge } = getOptions(options)
 
     // Get the ref object
     const hookRef = ref || useRef()
@@ -137,7 +137,7 @@ export const hookFactory = (events) => (
 
     // Set default joinedOnOff, to allow comparing against later
     const [ activeValue ] = useState(
-      checkJoinValues(offValue, onValue, onValue, noJoin)
+      checkJoinValues(offValue, onValue, onValue, noMerge)
     )
 
     // Create the callback ref ( i.e. function ref )
@@ -168,7 +168,7 @@ export const hookFactory = (events) => (
         : value === activeValue
           // If value and activeValue are equal, then the State is active either of the refs
           // The passed in ref or the current ref, so build value to use
-          ? checkJoinValues(offValue, onValue, activeValue, noJoin)
+          ? checkJoinValues(offValue, onValue, activeValue, noMerge)
           : offValue
 
       // Wrap the callbacks so we can call the passed in ref, and the new ref
