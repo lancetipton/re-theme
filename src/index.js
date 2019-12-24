@@ -6,6 +6,8 @@ import {
   setSizes,
   useDimensions,
 } from './dimensions'
+import { Dimensions } from "ReDimensions"
+
 import {
   addThemeEvent,
   fireThemeEvent,
@@ -25,6 +27,7 @@ import {
 export {
 
   // Dimensions exports
+  Dimensions,
   getSize,
   getSizeMap,
   getMergeSizes,
