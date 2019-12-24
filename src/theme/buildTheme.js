@@ -2,6 +2,7 @@
 'use strict'
 
 import { fireThemeEvent } from './themeEvent'
+import { joinRules } from './joinRules'
 import { Constants } from '../constants'
 import { getMergeSizes, getSize, getSizeMap } from '../dimensions'
 import { isObj, deepMerge, reduceObj, isEmpty,  unset } from 'jsutils'
@@ -163,7 +164,8 @@ export const buildTheme = (theme, width, height, defaultTheme) => {
   
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme)
   
-  builtTheme.RTMeta = { key, size, width, height }
-  
+  builtTheme.RTMeta = { key, size, width, height, join: joinRules }
+  builtTheme.join = builtTheme.join || joinRules
+
   return builtTheme
 }
