@@ -82,20 +82,27 @@ export const testTheme = {
   components: {
     button: {
       default: {
-        padding: 8,
-        borderRadius: 4,
-        fontSize: 14,
-        small: {
+        web: {
+          padding: 8,
+          borderRadius: 4,
+          fontSize: 14,
+          small: {
+            fontSize: 12,
+            borderRadius: 10,
+          },
+          medium: {
+            fontSize: 16,
+            padding: 15,
+          },
+          large: {
+            fontSize: 18,
+            padding: 20,
+          }
+        },
+        native: {
+          padding: 12,
+          borderRadius: 5,
           fontSize: 12,
-          borderRadius: 10,
-        },
-        medium: {
-          fontSize: 16,
-          padding: 15,
-        },
-        large: {
-          fontSize: 18,
-          padding: 20,
         }
       },
     }
@@ -104,17 +111,48 @@ export const testTheme = {
   meeting: {
     large: {
       text: {
-        time: {
-          width: 135,
+        web: {
+          time: {
+            font: 'WEB FONT',
+          },
         },
+        native: {
+          time: {
+            font: 'NATIVE FONT',
+          },
+        }
       }
     },
     medium: {
-      meetingListOffset: 200,
-      text: {
-        user: {
-          width: 107,
+      web: {
+        meetingListOffset: 200,
+        native: {
+          text: {
+            user: {
+              width: 30,
+            },
+          },
         },
+        web: {
+          text: {
+            user: {
+              width: 200,
+            },
+          },
+        },
+        text: {
+          user: {
+            width: 107,
+          },
+        },
+      },
+      native: {
+        meetingListOffset: 20,
+        text: {
+          user: {
+            width: 75,
+          },
+        }
       },
     },
     xsmall: {
@@ -130,7 +168,12 @@ export const testTheme = {
         flexGrow: 1,
       },
       meetingList: {
-        flex: 1,
+        web: {
+          flex: 1,
+        },
+        native: {
+          flex: 2,
+        }
       },
       loader: {
         alignSelf: 'center'

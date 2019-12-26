@@ -40,6 +40,7 @@ export default Array
       alias({
         entries: {
           ReDimensions: `src/dimensions/dimensions.${platform}.js`
+          RePlatform: `src/context/platform.${platform}.js`
         }
       })
     ]

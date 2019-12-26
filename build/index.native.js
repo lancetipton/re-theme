@@ -149,6 +149,15 @@ var fireThemeEvent = function fireThemeEvent(event) {
   });
 };
 
+var joinRules = function joinRules(arg1, arg2) {
+  for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    sources[_key - 2] = arguments[_key];
+  }
+  return jsutils.isObj(arg1) && jsutils.isArr(arg2) && (jsutils.isStr(arg2[0]) || jsutils.isArr(arg2[0])) ? jsutils.deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
+    return jsutils.get(arg1, arg);
+  }))) : jsutils.deepMerge.apply(void 0, [arg1, arg2].concat(sources));
+};
+
 var Constants = jsutils.deepFreeze({
   BUILD_EVENT: 'build',
   CHANGE_EVENT: 'change',
@@ -289,8 +298,10 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme) {
     key: key,
     size: size,
     width: width,
-    height: height
+    height: height,
+    join: joinRules
   };
+  builtTheme.join = builtTheme.join || joinRules;
   return builtTheme;
 };
 
@@ -445,6 +456,12 @@ var useThemeFocus = hookFactory({
   off: 'blur'
 });
 
+Object.defineProperty(exports, 'Dimensions', {
+  enumerable: true,
+  get: function () {
+    return reactNative.Dimensions;
+  }
+});
 exports.ReThemeContext = ReThemeContext;
 exports.ReThemeProvider = ReThemeProvider;
 exports.addThemeEvent = addThemeEvent;

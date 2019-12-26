@@ -4,6 +4,7 @@
 import { fireThemeEvent } from './themeEvent'
 import { joinRules } from './joinRules'
 import { Constants } from '../constants'
+import { RePlatform } from '../context'
 import { getMergeSizes, getSize, getSizeMap } from '../dimensions'
 import { isObj, deepMerge, reduceObj, isEmpty,  unset } from 'jsutils'
 
@@ -18,8 +19,6 @@ import { isObj, deepMerge, reduceObj, isEmpty,  unset } from 'jsutils'
  * @returns {Object} theme with the sizes moved to the root level
  */
 const buildSizedThemes = (theme, sizedTheme, size) => {
-
-  const printData = !isEmpty(sizedTheme)
 
   return reduceObj(theme, (name, value, sizedTheme) => {
 
@@ -54,50 +53,35 @@ const buildSizedThemes = (theme, sizedTheme, size) => {
 }
 
 /**
- * Transverse through the theme to find any size objects matching this size
- * <br/> Adds them to the root size object, and removes from the default paht
+ * Transverse through the theme to find any keys matching the current platform
+ * <br/> Once a platform key is found, any sub-keys of that object are not searched
  * @function
  * @example:
- * const meetings = { fontSize: 12, small: { fontSize: 10 } }
- * buildSizedTheme({ meetings })
- * # returns => { small: { meetings: { fontSize: 10 }, meetings: { fontSize: 12 } }
+ * # If platform is web
+ * const theme = { font: { web: { size: 12, native: {} }, native: { size: 10 } } }
+ * const platformTheme = getThemeForPlatform(theme)
+ * # returns { font: { size: 12, native: {} }}
  * 
  * @param {Object} themes - each theme module, keys are names and values are the theme rules
  *
- * @returns the sized theme object with sizes moved to root size object
+ * @returns {Object} - Update theme object with platform keys updated
  */
-const buildSizedTheme = theme => {
+const getThemeForPlatform = theme => {
+  
+  // Check if the key exists, and just return that if it does
+  // Otherwise look over the theme object, to check for child platform key objects
+  return theme[RePlatform] || reduceObj(theme, (key, value, platformTheme) => {
 
-  // Loop over the size map hash keys
-  return Object.keys(getSizeMap().hash)
-    .reduce((themeSized, size) => {
-      // Transverse through the theme to find any size objects matching this size
-      const builtSize = buildSizedThemes(theme, theme[size] || {}, size)
-      // If builtSize is not empty, then size data was found, so set it to the themeSized object
-      if(!isEmpty(builtSize)) themeSized[size] = builtSize
+    // Check if value is an object and
+    // recursively call getThemeForPlatform(value) to check for platform keys
+    isObj(value) && ( platformTheme[key] = getThemeForPlatform(value) )
 
-      return themeSized
-    }, theme)
+    // Return the update platformTheme object
+    return platformTheme
 
-}
+  // Use the theme as the original platformTheme to return
+  }, theme)
 
-/**
- * Checks if the theme is the same as the default theme.
- * <br/> If not then merges the two together
- * @function
- * @param {*} theme - Passed in user there
- * @param {*} defaultTheme - Cached default theme
- *
- * @returns {Object} - Theme object
- */
-const mergeWithDefault = (theme, defaultTheme) => {
-  // Check if theres a defaultTheme, and it's not equal to the passed in theme
-  const mergedTheme = defaultTheme && theme !== defaultTheme 
-    ? deepMerge(defaultTheme, theme)
-    : theme
-
-  // Build the sizes for the merged theme based on the sizeMap keys
-  return buildSizedTheme(mergedTheme)
 }
 
 /**
@@ -125,6 +109,57 @@ const joinThemeSizes = (theme, sizeKey, extraTheme={}) => {
         return themes
       }, [])
   )
+}
+
+/**
+ * Checks if the theme is the same as the default theme.
+ * <br/> If not then merges the two together
+ * @function
+ * @param {*} theme - Passed in user there
+ * @param {*} defaultTheme - Cached default theme
+ *
+ * @returns {Object} - Theme object
+ */
+const mergeWithDefault = (theme, defaultTheme) => {
+  // Check if theres a defaultTheme, and it's not equal to the passed in theme
+  const mergedTheme = defaultTheme && theme !== defaultTheme 
+    ? deepMerge(defaultTheme, theme)
+    : theme
+
+  // Build the sizes for the merged theme based on the sizeMap keys
+  return restructureTheme(mergedTheme)
+}
+
+/**
+ * Transverse through the theme to find any size objects matching this size
+ * <br/> Adds them to the root size object, and removes from the default paht
+ * @function
+ * @example:
+ * const meetings = { fontSize: 12, small: { fontSize: 10 } }
+ * restructureTheme({ meetings })
+ * # returns => { small: { meetings: { fontSize: 10 }, meetings: { fontSize: 12 } }
+ * 
+ * @param {Object} themes - each theme module, keys are names and values are the theme rules
+ *
+ * @returns {Object} - sized theme object with sizes moved to root size object
+ */
+const restructureTheme = theme => {
+
+  // Loop over the size map hash keys
+  return Object.keys(getSizeMap().hash)
+    .reduce((updatedTheme, size) => {
+
+      // Transverse through the theme to find any size objects matching this size
+      const builtSize = buildSizedThemes(theme, theme[size] || {}, size)
+
+      // If builtSize is not empty, then size data was found, so set it to the updatedTheme object
+      if(!isEmpty(builtSize)) updatedTheme[size] = builtSize
+
+      return updatedTheme
+
+    // Use the styles based on the platform if it exists
+    }, getThemeForPlatform(theme))
+
 }
 
 /**
@@ -169,3 +204,12 @@ export const buildTheme = (theme, width, height, defaultTheme) => {
 
   return builtTheme
 }
+
+process.env.NODE_ENV === 'test' && (module.exports = {
+  buildTheme,
+  buildSizedThemes,
+  getThemeForPlatform,
+  joinThemeSizes,
+  mergeWithDefault,
+  restructureTheme
+})
