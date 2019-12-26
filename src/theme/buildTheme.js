@@ -4,8 +4,9 @@
 import { fireThemeEvent } from './themeEvent'
 import { joinRules } from './joinRules'
 import { Constants } from '../constants'
-import { RePlatform } from '../context'
+import { RePlatform } from 'RePlatform'
 import { getMergeSizes, getSize, getSizeMap } from '../dimensions'
+import { checkValueUnits } from './unitRules'
 import { isObj, deepMerge, reduceObj, isEmpty,  unset } from 'jsutils'
 
 /**
@@ -74,7 +75,9 @@ const getThemeForPlatform = theme => {
 
     // Check if value is an object and
     // recursively call getThemeForPlatform(value) to check for platform keys
-    isObj(value) && ( platformTheme[key] = getThemeForPlatform(value) )
+    platformTheme[key] = isObj(value)
+      ? getThemeForPlatform(value)
+      : checkValueUnits(key, value)
 
     // Return the update platformTheme object
     return platformTheme

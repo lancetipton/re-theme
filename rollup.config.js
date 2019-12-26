@@ -39,7 +39,7 @@ export default Array
       ...shared.plugins,
       alias({
         entries: {
-          ReDimensions: `src/dimensions/dimensions.${platform}.js`
+          ReDimensions: `src/dimensions/dimensions.${platform}.js`,
           RePlatform: `src/context/platform.${platform}.js`
         }
       })

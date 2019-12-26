@@ -129,7 +129,12 @@ var Constants = jsutils.deepFreeze({
   CHANGE_EVENT: 'change',
   RESIZE_EVENT: 'resize',
   ADD_EVENT: 'addEventListener',
-  REMOVE_EVENT: 'removeEventListener'
+  REMOVE_EVENT: 'removeEventListener',
+  PLATFORM: {
+    NATIVE: 'native',
+    WEB: 'web'
+  },
+  CSS_UNITS: ['%', 'cm', 'ch', 'em', 'rem', 'ex', 'in', 'mm', 'pc', 'pt', 'px', 'vw', 'vh', 'vmin', 'vmax']
 });
 
 var DEBOUNCE_RATE = 100;
@@ -244,6 +249,8 @@ var joinRules = function joinRules(arg1, arg2) {
   }))) : jsutils.deepMerge.apply(void 0, [arg1, arg2].concat(sources));
 };
 
+var RePlatform = Constants.PLATFORM.WEB;
+
 var sizeMap = {
   entries: [['xsmall', 1], ['small', 320], ['medium', 768], ['large', 1024], ['xlarge', 1366]],
   hash: {},
@@ -324,8 +331,51 @@ var useDimensions = function useDimensions() {
   return dimensions;
 };
 
+var noUnitRules = {
+  animationIterationCount: true,
+  borderImageOutset: true,
+  borderImageSlice: true,
+  borderImageWidth: true,
+  boxFlex: true,
+  boxFlexGroup: true,
+  boxOrdinalGroup: true,
+  columnCount: true,
+  flex: true,
+  flexGrow: true,
+  flexPositive: true,
+  flexShrink: true,
+  flexNegative: true,
+  flexOrder: true,
+  gridRow: true,
+  gridColumn: true,
+  fontWeight: true,
+  lineClamp: true,
+  lineHeight: true,
+  opacity: true,
+  order: true,
+  orphans: true,
+  tabSize: true,
+  widows: true,
+  zIndex: true,
+  zoom: true,
+  fillOpacity: true,
+  floodOpacity: true,
+  stopOpacity: true,
+  strokeDasharray: true,
+  strokeDashoffset: true,
+  strokeMiterlimit: true,
+  strokeOpacity: true,
+  strokeWidth: true
+};
+var checkValueUnits = function checkValueUnits(key, value) {
+  if (noUnitRules[key] || !jsutils.isNum(value)) return value;
+  var strVal = jsutils.toStr(value);
+  return Constants.CSS_UNITS.some(function (unit) {
+    return strVal.indexOf(unit) !== -1;
+  }) ? value : "".concat(value, "px");
+};
+
 var buildSizedThemes = function buildSizedThemes(theme, sizedTheme, size) {
-  var printData = !jsutils.isEmpty(sizedTheme);
   return jsutils.reduceObj(theme, function (name, value, sizedTheme) {
     if (!jsutils.isObj(value)) return sizedTheme;
     if (name === size) {
@@ -338,16 +388,11 @@ var buildSizedThemes = function buildSizedThemes(theme, sizedTheme, size) {
     return sizedTheme;
   }, sizedTheme);
 };
-var buildSizedTheme = function buildSizedTheme(theme) {
-  return Object.keys(getSizeMap().hash).reduce(function (themeSized, size) {
-    var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
-    if (!jsutils.isEmpty(builtSize)) themeSized[size] = builtSize;
-    return themeSized;
+var getThemeForPlatform = function getThemeForPlatform(theme) {
+  return theme[RePlatform] || jsutils.reduceObj(theme, function (key, value, platformTheme) {
+    platformTheme[key] = jsutils.isObj(value) ? getThemeForPlatform(value) : checkValueUnits(key, value);
+    return platformTheme;
   }, theme);
-};
-var mergeWithDefault = function mergeWithDefault(theme, defaultTheme) {
-  var mergedTheme = defaultTheme && theme !== defaultTheme ? jsutils.deepMerge(defaultTheme, theme) : theme;
-  return buildSizedTheme(mergedTheme);
 };
 var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {
   var extraTheme = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -356,6 +401,17 @@ var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {
     theme[key] && themes.push(theme[key]);
     return themes;
   }, []))));
+};
+var mergeWithDefault = function mergeWithDefault(theme, defaultTheme) {
+  var mergedTheme = defaultTheme && theme !== defaultTheme ? jsutils.deepMerge(defaultTheme, theme) : theme;
+  return restructureTheme(mergedTheme);
+};
+var restructureTheme = function restructureTheme(theme) {
+  return Object.keys(getSizeMap().hash).reduce(function (updatedTheme, size) {
+    var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
+    if (!jsutils.isEmpty(builtSize)) updatedTheme[size] = builtSize;
+    return updatedTheme;
+  }, getThemeForPlatform(theme));
 };
 var buildTheme = function buildTheme(theme, width, height, defaultTheme) {
   if (!jsutils.isObj(theme)) return theme;

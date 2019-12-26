@@ -9,5 +9,22 @@ export const Constants = deepFreeze({
   PLATFORM: {
     NATIVE: 'native',
     WEB: 'web'
-  }
+  },
+  CSS_UNITS: [
+    '%',
+    'cm',
+    'ch',
+    'em',
+    'rem',
+    'ex',
+    'in',
+    'mm',
+    'pc',
+    'pt',
+    'px',
+    'vw',
+    'vh',
+    'vmin',
+    'vmax'
+  ]
 })
