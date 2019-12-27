@@ -7,7 +7,7 @@ import { Constants } from '../constants'
 import { RePlatform, Platform } from 'RePlatform'
 import { getMergeSizes, getSize, getSizeMap } from '../dimensions'
 import { checkValueUnits } from './unitRules'
-import { isObj, deepMerge, reduceObj, isEmpty,  unset } from 'jsutils'
+import { isObj, deepMerge, reduceObj, isEmpty, unset } from 'jsutils'
 
 /**
  * Searches the theme object for keys that match the passed in size

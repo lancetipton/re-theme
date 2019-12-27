@@ -1,10 +1,19 @@
 import { deepMerge, isArr, isObj, isStr, get } from 'jsutils'
 
 /**
- * Joins rules from the theme together. Accepts unlimited rules objects
- * Subset rules can be passed in as an array of key names on the theme to join together
- * Or the the actual rules objects should be passed in
+ * Checks if the passed in arguments match an object array pattern
+ * <br/> Which checks is the first argument is a ReTheme object, and the second is an array of paths
+ * @param {Object} arg1 - Checks if this is the root ReTheme Object
+ * @param {Array|Object} arg2 - Checks if this is an array of paths within the ReTheme object
  *
+ * @returns {boolean} - T/F if the passed in arguments match
+ */
+const hasManyFromTheme = (arg1, arg2) => (isObj(arg1) && isObj(arg1.RTMeta) && isArr(arg2))
+
+/**
+ * Joins rules from the theme together. Accepts unlimited rules objects
+ * <br/> Subset rules can be passed in as an array of key names on the theme to join together
+ * <br/> Or the the actual rules objects should be passed in
  * @param {Object} arg1 - Theme, or subset of theme rules 
  * @param {Object|Array} arg2 - Subset of theme rules or an array of keys to join from the theme
  * @param {Array} sources - Array of subset theme rules to join together
@@ -12,7 +21,7 @@ import { deepMerge, isArr, isObj, isStr, get } from 'jsutils'
  * @returns {Object} - Joined theme rules
  */
 export const joinRules = (arg1, arg2, ...sources) => {
-  return isObj(arg1) && isArr(arg2) && (isStr(arg2[0]) || isArr(arg2[0]))
+  return hasManyFromTheme(arg1, arg2)
     ? deepMerge( ...arg2.map(arg => isObj(arg) && arg || arg && get(arg1, arg)), ...sources)
     : deepMerge(arg1, arg2, ...sources)
 }

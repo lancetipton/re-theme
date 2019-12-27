@@ -241,11 +241,14 @@ var fireThemeEvent = function fireThemeEvent(event) {
   });
 };
 
+var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
+  return jsutils.isObj(arg1) && jsutils.isObj(arg1.RTMeta) && jsutils.isArr(arg2);
+};
 var joinRules = function joinRules(arg1, arg2) {
   for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
     sources[_key - 2] = arguments[_key];
   }
-  return jsutils.isObj(arg1) && jsutils.isArr(arg2) && (jsutils.isStr(arg2[0]) || jsutils.isArr(arg2[0])) ? jsutils.deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
+  return hasManyFromTheme(arg1, arg2) ? jsutils.deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
     return jsutils.isObj(arg) && arg || arg && jsutils.get(arg1, arg);
   })).concat(sources)) : jsutils.deepMerge.apply(void 0, [arg1, arg2].concat(sources));
 };
@@ -254,7 +257,7 @@ var RePlatform = Constants.PLATFORM.WEB;
 var Platform = {
   OS: 'web',
   select: function select(obj) {
-    return jsutils.isObj(obj) && obj[Constants.PLATFORM.WEB];
+    return jsutils.isObj(obj) && obj.web;
   },
   Version: 'ReTheme'
 };
@@ -397,7 +400,8 @@ var buildSizedThemes = function buildSizedThemes(theme, sizedTheme, size) {
   }, sizedTheme);
 };
 var getThemeForPlatform = function getThemeForPlatform(theme) {
-  var foundTheme = theme[Platform.OS] || theme[RePlatform] || jsutils.reduceObj(theme, function (key, value, platformTheme) {
+  if (!theme) return theme;
+  var foundTheme = theme['$' + Platform.OS] || theme[RePlatform] || jsutils.reduceObj(theme, function (key, value, platformTheme) {
     platformTheme[key] = jsutils.isObj(value) ? getThemeForPlatform(value) : checkValueUnits(key, value);
     return platformTheme;
   }, theme);
