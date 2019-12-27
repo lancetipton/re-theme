@@ -154,8 +154,8 @@ var joinRules = function joinRules(arg1, arg2) {
     sources[_key - 2] = arguments[_key];
   }
   return jsutils.isObj(arg1) && jsutils.isArr(arg2) && (jsutils.isStr(arg2[0]) || jsutils.isArr(arg2[0])) ? jsutils.deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
-    return jsutils.get(arg1, arg);
-  }))) : jsutils.deepMerge.apply(void 0, [arg1, arg2].concat(sources));
+    return jsutils.isObj(arg) && arg || arg && jsutils.get(arg1, arg);
+  })).concat(sources)) : jsutils.deepMerge.apply(void 0, [arg1, arg2].concat(sources));
 };
 
 var Constants = jsutils.deepFreeze({
@@ -165,8 +165,9 @@ var Constants = jsutils.deepFreeze({
   ADD_EVENT: 'addEventListener',
   REMOVE_EVENT: 'removeEventListener',
   PLATFORM: {
-    NATIVE: 'native',
-    WEB: 'web'
+    NATIVE: '$native',
+    WEB: '$web',
+    ALL: '$all'
   },
   CSS_UNITS: ['%', 'cm', 'ch', 'em', 'rem', 'ex', 'in', 'mm', 'pc', 'pt', 'px', 'vw', 'vh', 'vmin', 'vmax']
 });
@@ -311,10 +312,11 @@ var buildSizedThemes = function buildSizedThemes(theme, sizedTheme, size) {
   }, sizedTheme);
 };
 var getThemeForPlatform = function getThemeForPlatform(theme) {
-  return theme[RePlatform] || jsutils.reduceObj(theme, function (key, value, platformTheme) {
+  var foundTheme = theme[reactNative.Platform.OS] || theme[RePlatform] || jsutils.reduceObj(theme, function (key, value, platformTheme) {
     platformTheme[key] = jsutils.isObj(value) ? getThemeForPlatform(value) : checkValueUnits(key, value);
     return platformTheme;
   }, theme);
+  return theme[Constants.PLATFORM.ALL] ? jsutils.deepMerge(theme[Constants.PLATFORM.ALL], foundTheme) : foundTheme;
 };
 var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {
   var extraTheme = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};

@@ -13,6 +13,6 @@ import { deepMerge, isArr, isObj, isStr, get } from 'jsutils'
  */
 export const joinRules = (arg1, arg2, ...sources) => {
   return isObj(arg1) && isArr(arg2) && (isStr(arg2[0]) || isArr(arg2[0]))
-    ? deepMerge( ...arg2.map(arg => get(arg1, arg)) )
+    ? deepMerge( ...arg2.map(arg => isObj(arg) && arg || arg && get(arg1, arg)), ...sources)
     : deepMerge(arg1, arg2, ...sources)
 }

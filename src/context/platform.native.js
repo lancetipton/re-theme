@@ -1,3 +1,9 @@
 import { Constants } from '../constants'
+import { Platform } from 'react-native'
 
-export const RePlatform = Constants.PLATFORM.NATIVE
+const RePlatform = Constants.PLATFORM.NATIVE
+
+export {
+  RePlatform,
+  Platform
+}

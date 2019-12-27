@@ -4,7 +4,7 @@
 import { fireThemeEvent } from './themeEvent'
 import { joinRules } from './joinRules'
 import { Constants } from '../constants'
-import { RePlatform } from 'RePlatform'
+import { RePlatform, Platform } from 'RePlatform'
 import { getMergeSizes, getSize, getSizeMap } from '../dimensions'
 import { checkValueUnits } from './unitRules'
 import { isObj, deepMerge, reduceObj, isEmpty,  unset } from 'jsutils'
@@ -68,10 +68,13 @@ const buildSizedThemes = (theme, sizedTheme, size) => {
  * @returns {Object} - Update theme object with platform keys updated
  */
 const getThemeForPlatform = theme => {
-  
+  if(!theme) return theme
+
   // Check if the key exists, and just return that if it does
   // Otherwise look over the theme object, to check for child platform key objects
-  return theme[RePlatform] || reduceObj(theme, (key, value, platformTheme) => {
+  // Check for OS type first ( android || ios ), then Platform type ( web || native )
+  const foundTheme = theme[ '$'+Platform.OS ] || theme[ RePlatform ] ||
+    reduceObj(theme, (key, value, platformTheme) => {
 
     // Check if value is an object and
     // recursively call getThemeForPlatform(value) to check for platform keys
@@ -84,6 +87,11 @@ const getThemeForPlatform = theme => {
 
   // Use the theme as the original platformTheme to return
   }, theme)
+  
+  // Check for styles across all platforms, and merge with the found theme
+  return theme[Constants.PLATFORM.ALL]
+    ? deepMerge(theme[Constants.PLATFORM.ALL], foundTheme)
+    : foundTheme
 
 }
 

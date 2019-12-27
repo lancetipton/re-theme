@@ -82,7 +82,7 @@ export const testTheme = {
   components: {
     button: {
       default: {
-        web: {
+        $web: {
           padding: 8,
           borderRadius: 4,
           fontSize: 14,
@@ -99,7 +99,7 @@ export const testTheme = {
             padding: 20,
           }
         },
-        native: {
+        $native: {
           padding: 12,
           borderRadius: 5,
           fontSize: 12,
@@ -111,12 +111,12 @@ export const testTheme = {
   meeting: {
     large: {
       text: {
-        web: {
+        $web: {
           time: {
             font: 'WEB FONT',
           },
         },
-        native: {
+        $native: {
           time: {
             font: 'NATIVE FONT',
           },
@@ -124,16 +124,16 @@ export const testTheme = {
       }
     },
     medium: {
-      web: {
+      $web: {
         meetingListOffset: 200,
-        native: {
+        $native: {
           text: {
             user: {
               width: 30,
             },
           },
         },
-        web: {
+        $web: {
           text: {
             user: {
               width: 200,
@@ -146,7 +146,7 @@ export const testTheme = {
           },
         },
       },
-      native: {
+      $native: {
         meetingListOffset: 20,
         text: {
           user: {
@@ -168,10 +168,10 @@ export const testTheme = {
         flexGrow: 1,
       },
       meetingList: {
-        web: {
+        $web: {
           flex: 1,
         },
-        native: {
+        $native: {
           flex: 2,
         }
       },

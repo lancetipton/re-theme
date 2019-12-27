@@ -7,8 +7,9 @@ export const Constants = deepFreeze({
   ADD_EVENT: 'addEventListener',
   REMOVE_EVENT: 'removeEventListener',
   PLATFORM: {
-    NATIVE: 'native',
-    WEB: 'web'
+    NATIVE: '$native',
+    WEB: '$web',
+    ALL: '$all'
   },
   CSS_UNITS: [
     '%',
