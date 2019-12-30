@@ -149,16 +149,26 @@ var fireThemeEvent = function fireThemeEvent(event) {
   });
 };
 
+var joinCache = {};
+var checkMemoId = function checkMemoId(sources) {
+  var memoId = sources.pop();
+  return jsutils.isObj(memoId) ? sources.push(memoId) && false : jsutils.isStr(memoId) && memoId;
+};
 var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
   return jsutils.isObj(arg1) && jsutils.isObj(arg1.RTMeta) && jsutils.isArr(arg2);
 };
 var joinRules = function joinRules(arg1, arg2) {
+  if (jsutils.isStr(arg1)) return joinCache[arg1];
   for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
     sources[_key - 2] = arguments[_key];
   }
-  return hasManyFromTheme(arg1, arg2) ? jsutils.deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
+  var memoId = checkMemoId(sources);
+  if (memoId && joinCache[memoId]) return joinCache[memoId];
+  var builtStyles = hasManyFromTheme(arg1, arg2) ? jsutils.deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
     return jsutils.isObj(arg) && arg || arg && jsutils.get(arg1, arg);
   })).concat(sources)) : jsutils.deepMerge.apply(void 0, [arg1, arg2].concat(sources));
+  memoId && (joinCache[memoId] = builtStyles);
+  return builtStyles;
 };
 
 var Constants = jsutils.deepFreeze({
@@ -174,8 +184,6 @@ var Constants = jsutils.deepFreeze({
   },
   CSS_UNITS: ['%', 'cm', 'ch', 'em', 'rem', 'ex', 'in', 'mm', 'pc', 'pt', 'px', 'vw', 'vh', 'vmin', 'vmax']
 });
-
-var RePlatform = Constants.PLATFORM.NATIVE;
 
 var sizeMap = {
   entries: [['xsmall', 1], ['small', 320], ['medium', 768], ['large', 1024], ['xlarge', 1366]],
@@ -257,6 +265,8 @@ var useDimensions = function useDimensions() {
   return dimensions;
 };
 
+var RePlatform = Constants.PLATFORM.NATIVE;
+
 var noUnitRules = {
   animationIterationCount: true,
   borderImageOutset: true,
@@ -314,14 +324,27 @@ var buildSizedThemes = function buildSizedThemes(theme, sizedTheme, size) {
     return sizedTheme;
   }, sizedTheme);
 };
-var getThemeForPlatform = function getThemeForPlatform(theme) {
+var mergePlatformOS = function mergePlatformOS(key, theme) {
+  var allTheme = theme[Constants.PLATFORM.ALL];
+  var platformTheme = theme[RePlatform];
+  var osTheme = theme['$' + reactNative.Platform.OS];
+  return allTheme || osTheme || platformTheme ? jsutils.deepMerge({}, allTheme, platformTheme, osTheme) : theme;
+};
+var getPlatformTheme = function getPlatformTheme(theme) {
   if (!theme) return theme;
-  var foundTheme = theme['$' + reactNative.Platform.OS] || theme[RePlatform] || jsutils.reduceObj(theme, function (key, value, platformTheme) {
-    platformTheme[key] = jsutils.isObj(value) ? getThemeForPlatform(value) : checkValueUnits(key, value);
+  return jsutils.reduceObj(theme, function (key, value, platformTheme) {
+    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(key, value)) : checkValueUnits(key, value);
     return platformTheme;
   }, theme);
-  return theme[Constants.PLATFORM.ALL] ? jsutils.deepMerge(theme[Constants.PLATFORM.ALL], foundTheme) : foundTheme;
 };
+var restructureTheme = function restructureTheme(theme) {
+  return Object.keys(getSizeMap().hash).reduce(function (updatedTheme, size) {
+    var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
+    if (!jsutils.isEmpty(builtSize)) updatedTheme[size] = builtSize;
+    return updatedTheme;
+  }, getPlatformTheme(theme));
+};
+
 var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {
   var extraTheme = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   return jsutils.deepMerge.apply(void 0, [
@@ -333,13 +356,6 @@ var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {
 var mergeWithDefault = function mergeWithDefault(theme, defaultTheme) {
   var mergedTheme = defaultTheme && theme !== defaultTheme ? jsutils.deepMerge(defaultTheme, theme) : theme;
   return restructureTheme(mergedTheme);
-};
-var restructureTheme = function restructureTheme(theme) {
-  return Object.keys(getSizeMap().hash).reduce(function (updatedTheme, size) {
-    var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
-    if (!jsutils.isEmpty(builtSize)) updatedTheme[size] = builtSize;
-    return updatedTheme;
-  }, getThemeForPlatform(theme));
 };
 var buildTheme = function buildTheme(theme, width, height, defaultTheme) {
   if (!jsutils.isObj(theme)) return theme;
@@ -355,7 +371,6 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme) {
       xlarge = mergedTheme.xlarge,
       extraTheme = _objectWithoutProperties(mergedTheme, ["xsmall", "small", "medium", "large", "xlarge"]);
   var builtTheme = size ? joinThemeSizes(theme, key, extraTheme) : extraTheme;
-  fireThemeEvent(Constants.BUILD_EVENT, builtTheme);
   builtTheme.RTMeta = {
     key: key,
     size: size,
@@ -364,6 +379,7 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme) {
     join: joinRules
   };
   builtTheme.join = builtTheme.join || joinRules;
+  fireThemeEvent(Constants.BUILD_EVENT, builtTheme);
   return builtTheme;
 };
 
@@ -444,13 +460,14 @@ var createCBRef = function createCBRef(hookRef, events, methods, ref) {
   }, [methods.on, methods.off]);
 };
 var createMethods = function createMethods(offValue, onValue, setValue) {
+  var cbWatchers = [onValue, offValue];
   return {
     off: React.useCallback(function () {
       return setValue(offValue);
-    }, [onValue, offValue]),
+    }, cbWatchers),
     on: React.useCallback(function () {
       return setValue(onValue);
-    }, [offValue, onValue]),
+    }, cbWatchers),
     cleanup: function cleanup(methods) {
       if (!methods) return;
       jsutils.isFunc(methods.on) && methods.on(undefined);
@@ -498,7 +515,7 @@ var hookFactory = function hookFactory(events) {
         };
         return [wrapRef, useValue];
       }
-      return [elementRef, value];
+      return [elementRef, value, setValue];
     }
   );
 };

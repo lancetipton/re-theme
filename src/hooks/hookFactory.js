@@ -61,6 +61,8 @@ const createCBRef = (hookRef, events, methods, ref) => {
  * @returns {Object} - Contains the hooks to update to values on and off
  */
 const createMethods = (offValue, onValue, setValue) => {
+  const cbWatchers = [ onValue, offValue ]
+
   // These methods get called from createCBRef returned function
   // An event listener is added to the ref.current element
   // And when the event happens, Then either the on || off method is called!
@@ -68,10 +70,10 @@ const createMethods = (offValue, onValue, setValue) => {
   return {
     // Pass in the onValue / offValue to ensure it updates when the value changes
     // This will also cause the useCallback create from createCBRef to fire
-    off: useCallback(() => setValue(offValue), [ onValue, offValue ]),
+    off: useCallback(() => setValue(offValue), cbWatchers),
 
     // Watch both the onValue
-    on: useCallback(() => setValue(onValue), [ offValue, onValue ]),
+    on: useCallback(() => setValue(onValue), cbWatchers),
 
     // Clean up helper to avoid memory leaks
     cleanup: methods => {
@@ -93,12 +95,12 @@ const getOptions = (options={}) => (options && !isObj(options) ? {} : options)
 
 /**
  * Checks if the onValue and Off value should be joined
+ * @param {Object} offValue - Value to use then when state is off
+ * @param {Object} onValue - Value to use then when state is on
+ * @param {Object} valueOn - Alternate Value to use then when state is on
+ * @param {boolean} noMerge - Should merge the onValue with the offValue
  *
- * @param {*} offValue
- * @param {*} onValue
- * @param {*} valueOn
- * @param {*} noMerge
- * @returns
+ * @returns {Object} - valueOn or merged on / off object
  */
 const checkJoinValues = (offValue, onValue, valueOn, noMerge) => {
   // Need to clean it up to be more clear
@@ -182,7 +184,7 @@ export const hookFactory = (events) => (
     }
 
       // Return the elementRef function and value to the component
-    return [ elementRef, value ]
+    return [ elementRef, value, setValue ]
 
   }
 )

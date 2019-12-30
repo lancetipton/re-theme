@@ -1,4 +1,14 @@
-import { deepMerge, isArr, isObj, isStr, get } from 'jsutils'
+import { deepMerge, isArr, isStr, isObj, get } from 'jsutils'
+
+const joinCache = {}
+
+const checkMemoId = sources => {
+  const memoId = sources.pop()
+
+  return isObj(memoId)
+    ? sources.push(memoId) && false
+    : isStr(memoId) && memoId
+}
 
 /**
  * Checks if the passed in arguments match an object array pattern
@@ -21,7 +31,17 @@ const hasManyFromTheme = (arg1, arg2) => (isObj(arg1) && isObj(arg1.RTMeta) && i
  * @returns {Object} - Joined theme rules
  */
 export const joinRules = (arg1, arg2, ...sources) => {
-  return hasManyFromTheme(arg1, arg2)
+  
+  if(isStr(arg1)) return joinCache[arg1]
+  
+  const memoId = checkMemoId(sources)
+  if(memoId && joinCache[memoId]) return joinCache[memoId]
+  
+  const builtStyles = hasManyFromTheme(arg1, arg2)
     ? deepMerge( ...arg2.map(arg => isObj(arg) && arg || arg && get(arg1, arg)), ...sources)
     : deepMerge(arg1, arg2, ...sources)
+  
+  memoId && (joinCache[memoId] = builtStyles)
+
+  return builtStyles
 }
