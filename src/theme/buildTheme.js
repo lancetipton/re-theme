@@ -2,10 +2,10 @@
 'use strict'
 
 import { fireThemeEvent } from './themeEvent'
-import { joinRules } from './joinRules'
+import { join } from "ReJoinTheme"
 import { Constants } from '../constants'
 import { getMergeSizes, getSize } from '../dimensions'
-import { isObj, deepMerge } from 'jsutils'
+import { isObj, deepMerge, deepClone } from 'jsutils'
 import { restructureTheme } from './restructureTheme'
 
 /**
@@ -39,19 +39,20 @@ const joinThemeSizes = (theme, sizeKey, extraTheme={}) => {
  * Checks if the theme is the same as the default theme.
  * <br/> If not then merges the two together
  * @function
- * @param {*} theme - Passed in user there
- * @param {*} defaultTheme - Cached default theme
+ * @param {Object} theme - Passed in user there
+ * @param {Object} defaultTheme - Cached default theme
+ * @param {boolean} usrPlatform - Use a custom user theme Platform
  *
  * @returns {Object} - Theme object
  */
-const mergeWithDefault = (theme, defaultTheme) => {
+const mergeWithDefault = (theme, defaultTheme, usrPlatform) => {
   // Check if theres a defaultTheme, and it's not equal to the passed in theme
   const mergedTheme = defaultTheme && theme !== defaultTheme 
     ? deepMerge(defaultTheme, theme)
-    : theme
+    : deepMerge({}, theme)
 
   // Build the sizes for the merged theme based on the sizeMap keys
-  return restructureTheme(mergedTheme)
+  return restructureTheme(mergedTheme, usrPlatform)
 }
 
 /**
@@ -61,19 +62,22 @@ const mergeWithDefault = (theme, defaultTheme) => {
  * @param {number} width - Current screen width
  * @param {number} height - Current screen height
  * @param {Object} defaultTheme - Initial theme
+ * @param {boolean} usrPlatform - Use a custom user theme Platform
  *
  * @returns {Object} Subsection of the theme based on current dimensions if it exists
  */
-export const buildTheme = (theme, width, height, defaultTheme) => {
+export const buildTheme = (theme, width, height, defaultTheme, usrPlatform) => {
 
   // If theres no theme, or not valid curSize, just return the passed in theme
   if(!isObj(theme)) return theme
+
+  if(!isObj(usrPlatform)) usrPlatform = {}
 
   // Pull out the key and the size that matches the width
   const [ key, size ] = getSize(width)
   
   
-  const mergedTheme = mergeWithDefault(theme, defaultTheme)
+  const mergedTheme = mergeWithDefault(theme, defaultTheme, usrPlatform)
 
   // Extract the sizes from the theme
   const {
@@ -89,8 +93,8 @@ export const buildTheme = (theme, width, height, defaultTheme) => {
     ? joinThemeSizes(theme, key, extraTheme)
     : extraTheme
 
-  builtTheme.RTMeta = { key, size, width, height, join: joinRules }
-  builtTheme.join = builtTheme.join || joinRules
+  builtTheme.RTMeta = { key, size, width, height, join }
+  builtTheme.join = builtTheme.join || join
 
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme)
 

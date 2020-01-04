@@ -6,6 +6,7 @@ export const Constants = deepFreeze({
   RESIZE_EVENT: 'resize',
   ADD_EVENT: 'addEventListener',
   REMOVE_EVENT: 'removeEventListener',
+  NO_CACHE: '__$$RE_NO_CACHE__',
   PLATFORM: {
     NATIVE: '$native',
     WEB: '$web',

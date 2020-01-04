@@ -5,7 +5,38 @@ import { getSizeMap } from '../dimensions'
 import { Constants } from '../constants'
 import { RePlatform, Platform } from 'RePlatform'
 import { checkValueUnits } from './unitRules'
-import { isObj, deepMerge, reduceObj, isEmpty, unset } from 'jsutils'
+import { isObj, deepMerge, reduceObj, isEmpty, unset, get } from 'jsutils'
+
+// Default platforms to use when restructuring the theme
+// Use array, so we don't lose the order
+const usePlatforms = [
+  // Rules for the OS platform ( web || ios || android )
+  '$'+Platform.OS,
+  // Rules for the RePlatform ( web || native )
+  RePlatform,
+  // Rules for all platforms and os's
+  Constants.PLATFORM.ALL,
+]
+
+/**
+ * Joins the passed in user platform with the default platforms array
+ * @param {Object} usrPlatforms - use defined platforms to use when building the theme
+ *
+ * @returns {Array} - Contains platforms to use when building the theme
+ */
+const buildPlatforms = usrPlatforms => {
+
+  const platsToUse = Object.keys(usrPlatforms).filter(key => usrPlatforms[key])
+  
+  return usePlatforms.reduce((platforms, plat) => {
+      usrPlatforms[plat] !== false &&
+        platforms.indexOf(plat) === -1 &&
+        platforms.unshift(plat)
+
+    return platforms
+  }, platsToUse)
+
+}
 
 /**
  * Searches the theme object for keys that match the passed in size
@@ -51,27 +82,29 @@ const buildSizedThemes = (theme, sizedTheme, size) => {
 
 }
 
-
-const mergePlatformOS = (key, theme) => {
+/**
+ * Merges styles of any that exist within the platforms object and the theme
+ * <br/> If no platforms exists, just return the theme
+ * @function
+ * @param {Object} theme - Current theme object that holds the style rules
+ * @param {boolean} platforms - Platforms to use when building the theme
+ *
+ * @returns - Merged platform theme rules, or the passed in theme if no rules exist
+ */
+const mergePlatformOS = (theme, platforms) => {
   
-  // Get the rules for all platforms and os
-  const allTheme = theme[Constants.PLATFORM.ALL]
+  // Loop the platforms and check if they are allowed and the platform exist on theme
+  // If is a valid platform add to the toMerge array
+  const toMerge = platforms.reduce((toMerge, plat) => {
+      theme[plat] && toMerge.push(theme[plat])
 
-  // Get the rules for the RePlatform ( web || native )
-  const platformTheme = theme[ RePlatform ]
+      return toMerge
+    }, [])
 
-  // Get the rules for the OS platform ( web || ios || android )
-  const osTheme = theme[ '$'+Platform.OS ]
-
-  // If any of the custom theme object exist, then merge them together
+  // If any of the platform theme object exist, then merge them together
   // Otherwise just return the passed in theme object
-  return allTheme || osTheme || platformTheme
-    ? deepMerge(
-        {},
-        allTheme,
-        platformTheme,
-        osTheme
-      )
+  return toMerge.length
+    ? deepMerge({}, ...toMerge)
     : theme
 
 }
@@ -87,10 +120,11 @@ const mergePlatformOS = (key, theme) => {
  * # returns { font: { size: 12, native: {} }}
  * 
  * @param {Object} themes - each theme module, keys are names and values are the theme rules
+ * @param {boolean} platforms - Platforms to use when building the theme
  *
  * @returns {Object} - Update theme object with platform keys updated
  */
-const getPlatformTheme = theme => {
+const getPlatformTheme = (theme, platforms) => {
   if(!theme) return theme
 
   return reduceObj(theme, (key, value, platformTheme) => {
@@ -98,7 +132,7 @@ const getPlatformTheme = theme => {
     // If it is make call to merge platform specific styles, and recusivly call self
     // Otherwise check the values units
     platformTheme[key] = isObj(value)
-      ? getPlatformTheme( mergePlatformOS(key, value) )
+      ? getPlatformTheme( mergePlatformOS(value, platforms), platforms)
       : checkValueUnits(key, value)
 
     // Return the update platformTheme object
@@ -119,10 +153,12 @@ const getPlatformTheme = theme => {
  * # returns => { small: { meetings: { fontSize: 10 }, meetings: { fontSize: 12 } }
  * 
  * @param {Object} themes - each theme module, keys are names and values are the theme rules
+ * @param {boolean} usrPlatform - Use a custom user theme Platform
  *
  * @returns {Object} - sized theme object with sizes moved to root size object
  */
-export const restructureTheme = theme => {
+export const restructureTheme = (theme, usrPlatform) => {
+
   // Use the theme based on the platform if it exists
   // Pass in the response after the sizes are set
     // Loop over the size map hash keys
@@ -136,5 +172,6 @@ export const restructureTheme = theme => {
       if(!isEmpty(builtSize)) updatedTheme[size] = builtSize
 
       return updatedTheme
-    }, getPlatformTheme(theme))
+    }, getPlatformTheme(theme, buildPlatforms(usrPlatform)))
+
 }

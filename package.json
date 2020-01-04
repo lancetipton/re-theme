@@ -48,7 +48,8 @@
     "preset": "rollup-jest",
     "moduleNameMapper": {
       "ReDimensions": "<rootDir>/src/dimensions/dimensions.web.js",
-      "RePlatform": "<rootDir>/src/context/platform.web.js"
+      "RePlatform": "<rootDir>/src/context/platform.web.js",
+      "ReJoinTheme": "<rootDir>/src/join/joinTheme.web.js"
     },
     "transform": {
       "^.+\\.js$": "babel-jest"

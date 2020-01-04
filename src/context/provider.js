@@ -21,7 +21,7 @@ const dims = Dimensions.get("window")
  * @returns {Component|Object} - ReThemeContext.Provider - Provides the theme to the Context consumer
  */
 export const ReThemeProvider = props => {
-  const { children, theme,  merge: doMerge } = props
+  const { children, theme,  merge: doMerge, platforms } = props
   const merge = Boolean(doMerge || (!doMerge && doMerge !== false)) || false
   
   /**
@@ -61,7 +61,8 @@ export const ReThemeProvider = props => {
         theme,
         dimensions.width,
         dimensions.height,
-        merge && getDefaultTheme()
+        merge && getDefaultTheme(),
+        platforms
       )
     }>
       { children }

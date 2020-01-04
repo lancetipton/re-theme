@@ -40,7 +40,8 @@ export default Array
       alias({
         entries: {
           ReDimensions: `src/dimensions/dimensions.${platform}.js`,
-          RePlatform: `src/context/platform.${platform}.js`
+          RePlatform: `src/context/platform.${platform}.js`,
+          ReJoinTheme: `src/join/joinTheme.${platform}.js`,
         }
       })
     ]
