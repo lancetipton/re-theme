@@ -204,6 +204,21 @@ var join = function join(arg1, arg2) {
   return builtStyles;
 };
 
+var getTheme = function getTheme(id) {
+  var _this = this;
+  if (!jsutils.isStr(id)) return console.error("theme.get requires an ID as the first argument!", id) || {};
+  var cache = getCache(id);
+  if (cache) return cache;
+  for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    sources[_key - 1] = arguments[_key];
+  }
+  var styles = jsutils.deepMerge.apply(void 0, _toConsumableArray(sources.map(function (source) {
+    return jsutils.isObj(source) ? source : jsutils.isArr(source) || jsutils.isStr(source) ? jsutils.get(_this, source) : {};
+  })));
+  addCache(id, styles);
+  return styles;
+};
+
 var sizeMap = {
   entries: [['xsmall', 1], ['small', 320], ['medium', 768], ['large', 1024], ['xlarge', 1366]],
   hash: {},
@@ -409,10 +424,10 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme, usrPlat
     key: key,
     size: size,
     width: width,
-    height: height,
-    join: join
+    height: height
   };
   builtTheme.join = builtTheme.join || join;
+  builtTheme.get = builtTheme.get || getTheme;
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme);
   return builtTheme;
 };
@@ -478,7 +493,9 @@ var ReThemeProvider = function ReThemeProvider(props) {
 };
 
 var useTheme = function useTheme() {
-  return React.useContext(ReThemeContext);
+  var theme = React.useContext(ReThemeContext);
+  theme.get = getTheme;
+  return theme;
 };
 
 var updateListeners = function updateListeners(element, type, events, methods) {

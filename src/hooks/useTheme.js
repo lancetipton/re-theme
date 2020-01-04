@@ -2,6 +2,7 @@
 
 import React, { useContext } from "react"
 import { ReThemeContext } from '../context/context'
+import { getTheme } from '../theme/getTheme'
 
 /**
  * Uses the useContext hook from react to get the current theme ( Value prop of the context )
@@ -9,5 +10,8 @@ import { ReThemeContext } from '../context/context'
  * @returns { Object } - Current theme
  */
 export const useTheme = () => {
-  return useContext(ReThemeContext)
+  const theme = useContext(ReThemeContext)
+  theme.get = getTheme
+
+  return theme
 }

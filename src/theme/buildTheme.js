@@ -3,6 +3,7 @@
 
 import { fireThemeEvent } from './themeEvent'
 import { join } from "ReJoinTheme"
+import { getTheme } from "./getTheme"
 import { Constants } from '../constants'
 import { getMergeSizes, getSize } from '../dimensions'
 import { isObj, deepMerge, deepClone } from 'jsutils'
@@ -93,8 +94,9 @@ export const buildTheme = (theme, width, height, defaultTheme, usrPlatform) => {
     ? joinThemeSizes(theme, key, extraTheme)
     : extraTheme
 
-  builtTheme.RTMeta = { key, size, width, height, join }
+  builtTheme.RTMeta = { key, size, width, height }
   builtTheme.join = builtTheme.join || join
+  builtTheme.get = builtTheme.get || getTheme
 
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme)
 
