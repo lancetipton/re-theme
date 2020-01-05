@@ -42,11 +42,15 @@ export const getTheme = function (id, ...sources){
   // Build the styles by merging the sources together
   // Check if each source is an id to cache or get the styles from the theme
   const styles = deepMerge(
-    ...sourceStyles.map(source => 
-      isObj(source)
+    ...sourceStyles.reduce((toMerge, source) => {
+      const styles = isObj(source)
         ? source
-        : getCache(createMemoId(source)) || get(this, source)
-    )
+        : source && getCache(createMemoId(source)) || get(this, source)
+
+      styles && toMerge.push(styles)
+
+      return toMerge
+    }, [])
   )
 
   addCache(memoId, styles)
