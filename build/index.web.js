@@ -317,7 +317,7 @@ var getTheme = function getTheme(id) {
   var cache = getCache(memoId);
   if (cache) return cache;
   var styles = jsutils.deepMerge.apply(void 0, _toConsumableArray(sourceStyles.reduce(function (toMerge, source) {
-    var styles = jsutils.isObj(source) ? source : source && getCache(createMemoId(source)) || jsutils.get(_this, source);
+    var styles = jsutils.isObj(source) ? source : source && (getCache(createMemoId(source)) || jsutils.get(_this, source));
     styles && toMerge.push(styles);
     return toMerge;
   }, [])));

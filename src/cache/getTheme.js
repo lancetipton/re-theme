@@ -45,7 +45,7 @@ export const getTheme = function (id, ...sources){
     ...sourceStyles.reduce((toMerge, source) => {
       const styles = isObj(source)
         ? source
-        : source && getCache(createMemoId(source)) || get(this, source)
+        : source && (getCache(createMemoId(source)) || get(this, source))
 
       styles && toMerge.push(styles)
 
