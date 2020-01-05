@@ -49,7 +49,7 @@
     "moduleNameMapper": {
       "ReDimensions": "<rootDir>/src/dimensions/dimensions.web.js",
       "RePlatform": "<rootDir>/src/context/platform.web.js",
-      "ReJoinTheme": "<rootDir>/src/join/joinTheme.web.js"
+      "ReJoinTheme": "<rootDir>/src/cache/joinTheme.web.js"
     },
     "transform": {
       "^.+\\.js$": "babel-jest"

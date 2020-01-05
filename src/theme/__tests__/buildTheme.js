@@ -52,6 +52,16 @@ describe('Theme', () => {
 
     })
 
+    it('should add the get function to the theme object', () => {
+
+      expect(typeof buttonTheme.get).toBe('undefined')
+
+      const theme = Theme.buildTheme(buttonTheme, 200, 1000, {})
+
+      expect(typeof theme.get).toBe('function')
+
+    })
+
     it('should make call to get the current size using the passed in width', () => {
 
       const theme = Theme.buildTheme(buttonTheme, 200, 1000, {})
@@ -79,51 +89,6 @@ describe('Theme', () => {
       expect(Theme.buildTheme(arrTheme)).toEqual(arrTheme)
 
       expect(Dims.getSize).not.toHaveBeenCalled()
-
-    })
-
-  })
-
-  describe('getThemeForPlatform', () => {
-
-    afterEach(() => {
-      jest.clearAllMocks()
-      themeClone = deepClone(testTheme)
-    })
-
-    it('should update the theme to use the values of the current platform', () => {
-      const webList = get(testTheme, 'meeting.xsmall.meetingList.$web')
-
-      expect(webList).not.toBe(undefined)
-      expect(get(testTheme, 'meeting.xsmall.meetingList.$native')).not.toBe(undefined)
-
-      const theme = Theme.getThemeForPlatform(themeClone)
-
-      expect(get(theme, 'meeting.xsmall.meetingList.$web')).toBe(undefined)
-      expect(get(theme, 'meeting.xsmall.meetingList.$native')).toBe(undefined)
-
-      expect(get(theme, 'meeting.xsmall.meetingList')).toEqual(webList)
-
-    })
-
-    it('should return an updated theme using the current platform values', () => {
-
-      expect(get(testTheme, 'meeting.large.text.time.font')).toBe(undefined)
-      expect(get(testTheme, 'meeting.large.text.$web.time.font')).toBe('WEB FONT')
-      
-      const theme = Theme.getThemeForPlatform(themeClone)
-
-      expect(get(theme, 'meeting.large.text.time.font')).toBe('WEB FONT')
-    })
-
-    it('should NOT remove sub platform keys once a platform key is found', () => {
-
-      const webNative = get(testTheme, 'meeting.medium.$web.$native')
-      expect(webNative).not.toBe(undefined)
-
-      const theme = Theme.getThemeForPlatform(themeClone)
-
-      expect(get(theme, 'meeting.medium.$native')).toEqual(webNative)
 
     })
 

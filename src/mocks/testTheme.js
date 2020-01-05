@@ -109,6 +109,13 @@ export const testTheme = {
   },
   colors,
   meeting: {
+    xlarge: {
+      text: {
+        time: {
+          font: 'WEB FONT',
+        },
+      }
+    },
     large: {
       text: {
         $web: {
@@ -116,12 +123,17 @@ export const testTheme = {
             font: 'WEB FONT',
           },
         },
+        $customPlatform: {
+          time: {
+            font: 'CUSTOM FONT',
+          },
+        },
         $native: {
           time: {
             font: 'NATIVE FONT',
           },
         }
-      }
+      },
     },
     medium: {
       $web: {
@@ -129,7 +141,7 @@ export const testTheme = {
         $native: {
           text: {
             user: {
-              width: 30,
+              width: '30px',
             },
           },
         },
@@ -142,7 +154,7 @@ export const testTheme = {
         },
         text: {
           user: {
-            width: 107,
+            width: '107px',
           },
         },
       },
@@ -155,18 +167,17 @@ export const testTheme = {
         }
       },
     },
+    small: {
+      text: {
+        user: {
+          width: '95px',
+        },
+        time: {
+          width: 125,
+        },
+      }
+    },
     xsmall: {
-      meetingListOffset: 500,
-      horizontalScroll: {
-        flexDirection: 'row',
-        flex: 1,
-      },
-      table: {
-        backgroundColor: '#FFFFFF',
-        flexDirection: 'column',
-        minWidth: 735,
-        flexGrow: 1,
-      },
       meetingList: {
         $web: {
           flex: 1,
@@ -175,61 +186,13 @@ export const testTheme = {
           flex: 2,
         }
       },
-      loader: {
-        alignSelf: 'center'
-      },
-      deleteButton: {
-        width: 90,
-        height: 40,
-        margin: 22,
-        marginLeft: 19,
-      },
       text: {
-        spacing: {
-          textAlign: 'left',
-        },
-        id: {
-          width: 65,
-        },
         user: {
-          width: 95,
+          width: '200px',
         },
         time: {
           width: 125,
         },
-        company: {
-          width: 90,
-        },
-      },
-      checkIn: {
-        width: 60,
-        marginRight: 10,
-      },
-      header: {
-        height: 55
-      },
-      row: {
-        height: 90,
-        padding: 10,
-        paddingLeft: 27,
-        borderBottomColor: 'rgba(0,0,0,0.1)',
-        borderBottomStyle: 'solid',
-        borderBottomWidth: '1px',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      },
-      columnHeader: {
-        fontWeight: 'bold',
-        fontSize: 12,
-      },
-      checkInIconButton: {
-        padding: 12,
-        width: 52,
-        marginLeft: 5,
-      },
-      rowLoader: {
-        marginTop: 31,
       },
     }
   },

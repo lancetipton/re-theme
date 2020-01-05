@@ -165,6 +165,12 @@ var Constants = jsutils.deepFreeze({
 });
 
 var joinCache = {};
+var convertToId = function convertToId(sources) {
+  return jsutils.isArr(sources) && sources.reduce(function (memoId, source) {
+    var addToId = jsutils.isArr(source) && jsutils.isStr(source[0]) ? source.join('-') : jsutils.isStr(source) ? source.replace(/./g, '-') : false;
+    return !addToId ? memoId : memoId && "".concat(memoId, "-").concat(addToId) || addToId;
+  }, '') || false;
+};
 var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
   return jsutils.isObj(arg1) && jsutils.isObj(arg1.RTMeta) && jsutils.isArr(arg2);
 };
@@ -204,18 +210,24 @@ var join = function join(arg1, arg2) {
   return builtStyles;
 };
 
+var checkIdForStyle = function checkIdForStyle(theme, id) {
+  return jsutils.isStr(id) && jsutils.get(theme, id);
+};
 var getTheme = function getTheme(id) {
   var _this = this;
-  if (!jsutils.isStr(id)) return console.error("theme.get requires an ID as the first argument!", id) || {};
-  var cache = getCache(id);
-  if (cache) return cache;
+  var styleFromId = checkIdForStyle(this, id);
   for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     sources[_key - 1] = arguments[_key];
   }
-  var styles = jsutils.deepMerge.apply(void 0, _toConsumableArray(sources.map(function (source) {
-    return jsutils.isObj(source) ? source : jsutils.isArr(source) || jsutils.isStr(source) ? jsutils.get(_this, source) : {};
+  var sourceStyles = !styleFromId ? sources : [styleFromId].concat(sources);
+  var memoId = jsutils.isStr(id) ? id : convertToId(sources);
+  if (!memoId) return console.error("theme.get requires an ID or array or string sources!", id, sources) || {};
+  var cache = getCache(memoId);
+  if (cache) return cache;
+  var styles = jsutils.deepMerge.apply(void 0, _toConsumableArray(sourceStyles.map(function (source) {
+    return jsutils.isObj(source) ? source : jsutils.isArr(source) || jsutils.isStr(source) ? jsutils.isStr(source) && getCache(source) || jsutils.get(_this, source) : {};
   })));
-  addCache(id, styles);
+  addCache(memoId, styles);
   return styles;
 };
 

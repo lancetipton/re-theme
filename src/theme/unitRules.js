@@ -1,5 +1,5 @@
 import { Constants } from '../constants'
-import { toStr, isNum, isObj, reduceObj } from 'jsutils'
+import { toStr, isNum, isObj, isStr, reduceObj } from 'jsutils'
 
 export const noUnitRules = {
   animationIterationCount: true,
@@ -49,11 +49,7 @@ export const noUnitRules = {
  * @returns {string|number} - update value with px units when needed
  */
 export const checkValueUnits = (key, value) => {
-  if(noUnitRules[key] || !isNum(value)) return value
-
-  const strVal = toStr(value)
-  return Constants.CSS_UNITS.some(unit => strVal.indexOf(unit) !== -1)
+  return noUnitRules[key] || !isNum(value)
     ? value
     : `${value}px`
-
 }

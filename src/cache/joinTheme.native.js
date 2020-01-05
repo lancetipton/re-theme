@@ -1,4 +1,4 @@
-import { addCache, checkCache, buildCacheObj } from './joinCache'
+import { addCache, checkCache, buildCacheObj } from './cache'
 
 /**
  * Joins rules from the theme together. Accepts unlimited rules objects

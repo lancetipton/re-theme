@@ -2,11 +2,11 @@
 'use strict'
 
 import { fireThemeEvent } from './themeEvent'
-import { join } from "ReJoinTheme"
-import { getTheme } from "./getTheme"
+import { join } from 'ReJoinTheme'
+import { getTheme } from '../cache/getTheme'
 import { Constants } from '../constants'
 import { getMergeSizes, getSize } from '../dimensions'
-import { isObj, deepMerge, deepClone } from 'jsutils'
+import { isObj, deepMerge } from 'jsutils'
 import { restructureTheme } from './restructureTheme'
 
 /**
@@ -102,9 +102,3 @@ export const buildTheme = (theme, width, height, defaultTheme, usrPlatform) => {
 
   return builtTheme
 }
-
-process.env.NODE_ENV === 'test' && (module.exports = {
-  buildTheme,
-  joinThemeSizes,
-  mergeWithDefault,
-})

@@ -2,7 +2,7 @@
 
 import React, { useContext } from "react"
 import { ReThemeContext } from '../context/context'
-import { getTheme } from '../theme/getTheme'
+import { getTheme } from '../cache/getTheme'
 
 /**
  * Uses the useContext hook from react to get the current theme ( Value prop of the context )

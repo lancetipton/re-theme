@@ -9,7 +9,7 @@ import { isObj, deepMerge, reduceObj, isEmpty, unset, get } from 'jsutils'
 
 // Default platforms to use when restructuring the theme
 // Use array, so we don't lose the order
-const usePlatforms = [
+const defaultPlatforms = [
   // Rules for the OS platform ( web || ios || android )
   '$'+Platform.OS,
   // Rules for the RePlatform ( web || native )
@@ -28,7 +28,7 @@ const buildPlatforms = usrPlatforms => {
 
   const platsToUse = Object.keys(usrPlatforms).filter(key => usrPlatforms[key])
   
-  return usePlatforms.reduce((platforms, plat) => {
+  return defaultPlatforms.reduce((platforms, plat) => {
       usrPlatforms[plat] !== false &&
         platforms.indexOf(plat) === -1 &&
         platforms.unshift(plat)
@@ -129,7 +129,7 @@ const getPlatformTheme = (theme, platforms) => {
 
   return reduceObj(theme, (key, value, platformTheme) => {
     // Check if the value is an object
-    // If it is make call to merge platform specific styles, and recusivly call self
+    // If it is make call to merge platform specific styles, and recursively call self
     // Otherwise check the values units
     platformTheme[key] = isObj(value)
       ? getPlatformTheme( mergePlatformOS(value, platforms), platforms)
@@ -157,7 +157,7 @@ const getPlatformTheme = (theme, platforms) => {
  *
  * @returns {Object} - sized theme object with sizes moved to root size object
  */
-export const restructureTheme = (theme, usrPlatform) => {
+export const restructureTheme = (theme, usrPlatform={}) => {
 
   // Use the theme based on the platform if it exists
   // Pass in the response after the sizes are set
