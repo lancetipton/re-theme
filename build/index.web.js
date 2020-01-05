@@ -243,9 +243,18 @@ var fireThemeEvent = function fireThemeEvent(event) {
 };
 
 var joinCache = {};
+addThemeEvent && addThemeEvent(Constants.BUILD_EVENT, function () {
+  return clearCache();
+});
+var strArrToId = function strArrToId(arr) {
+  return arr.join('-').replace(/\./g, '-');
+};
+var createMemoId = function createMemoId(item) {
+  return jsutils.isArr(item) && jsutils.isStr(item[0]) ? strArrToId(item) : jsutils.isStr(item) && item;
+};
 var convertToId = function convertToId(sources) {
   return jsutils.isArr(sources) && sources.reduce(function (memoId, source) {
-    var addToId = jsutils.isArr(source) && jsutils.isStr(source[0]) ? source.join('-') : jsutils.isStr(source) ? source.replace(/./g, '-') : false;
+    var addToId = createMemoId(source);
     return !addToId ? memoId : memoId && "".concat(memoId, "-").concat(addToId) || addToId;
   }, '') || false;
 };
@@ -253,8 +262,12 @@ var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
   return jsutils.isObj(arg1) && jsutils.isObj(arg1.RTMeta) && jsutils.isArr(arg2);
 };
 var checkMemoId = function checkMemoId(sources) {
-  var memoId = sources.pop();
-  return jsutils.isObj(memoId) ? sources.push(memoId) && false : jsutils.isStr(memoId) && memoId;
+  var idLocation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'end';
+  var memoId = sources[idLocation !== 'end' ? 'shift' : 'pop']();
+  return jsutils.isObj(memoId) ? sources[idLocation !== 'end' ? 'unshift' : 'push'](memoId) && false : createMemoId(memoId);
+};
+var clearCache = function clearCache(key) {
+  return key ? jsutils.unset(joinCache, [key]) : joinCache = {};
 };
 var getCache = function getCache(key) {
   return key ? joinCache[key] : joinCache;
@@ -263,7 +276,8 @@ var addCache = function addCache(key, cache) {
   return key && cache && (joinCache[key] = cache);
 };
 var checkCache = function checkCache(sources) {
-  var memoId = checkMemoId(sources);
+  var idLocation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'end';
+  var memoId = checkMemoId(sources, idLocation);
   return {
     memoId: memoId,
     cache: memoId && getCache(memoId)
@@ -303,7 +317,7 @@ var getTheme = function getTheme(id) {
   var cache = getCache(memoId);
   if (cache) return cache;
   var styles = jsutils.deepMerge.apply(void 0, _toConsumableArray(sourceStyles.map(function (source) {
-    return jsutils.isObj(source) ? source : jsutils.isArr(source) || jsutils.isStr(source) ? jsutils.isStr(source) && getCache(source) || jsutils.get(_this, source) : {};
+    return jsutils.isObj(source) ? source : getCache(createMemoId(source)) || jsutils.get(_this, source);
   })));
   addCache(memoId, styles);
   return styles;
@@ -435,14 +449,10 @@ var noUnitRules = {
   strokeWidth: true
 };
 var checkValueUnits = function checkValueUnits(key, value) {
-  if (noUnitRules[key] || !jsutils.isNum(value)) return value;
-  var strVal = jsutils.toStr(value);
-  return Constants.CSS_UNITS.some(function (unit) {
-    return strVal.indexOf(unit) !== -1;
-  }) ? value : "".concat(value, "px");
+  return noUnitRules[key] || !jsutils.isNum(value) ? value : "".concat(value, "px");
 };
 
-var usePlatforms = [
+var defaultPlatforms = [
 '$' + Platform.OS,
 RePlatform,
 Constants.PLATFORM.ALL];
@@ -450,7 +460,7 @@ var buildPlatforms = function buildPlatforms(usrPlatforms) {
   var platsToUse = Object.keys(usrPlatforms).filter(function (key) {
     return usrPlatforms[key];
   });
-  return usePlatforms.reduce(function (platforms, plat) {
+  return defaultPlatforms.reduce(function (platforms, plat) {
     usrPlatforms[plat] !== false && platforms.indexOf(plat) === -1 && platforms.unshift(plat);
     return platforms;
   }, platsToUse);
@@ -482,7 +492,8 @@ var getPlatformTheme = function getPlatformTheme(theme, platforms) {
     return platformTheme;
   }, theme);
 };
-var restructureTheme = function restructureTheme(theme, usrPlatform) {
+var restructureTheme = function restructureTheme(theme) {
+  var usrPlatform = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   return Object.keys(getSizeMap().hash).reduce(function (updatedTheme, size) {
     var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
     if (!jsutils.isEmpty(builtSize)) updatedTheme[size] = builtSize;
@@ -524,7 +535,7 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme, usrPlat
     height: height
   };
   builtTheme.join = builtTheme.join || join;
-  builtTheme.get = builtTheme.get || getTheme;
+  builtTheme.get = builtTheme.get || getTheme.bind(builtTheme);
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme);
   return builtTheme;
 };
@@ -591,7 +602,7 @@ var ReThemeProvider = function ReThemeProvider(props) {
 
 var useTheme = function useTheme() {
   var theme = React.useContext(ReThemeContext);
-  theme.get = getTheme;
+  theme.get = getTheme.bind(theme);
   return theme;
 };
 

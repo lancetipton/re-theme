@@ -96,7 +96,7 @@ export const buildTheme = (theme, width, height, defaultTheme, usrPlatform) => {
 
   builtTheme.RTMeta = { key, size, width, height }
   builtTheme.join = builtTheme.join || join
-  builtTheme.get = builtTheme.get || getTheme
+  builtTheme.get = builtTheme.get || getTheme.bind(builtTheme)
 
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme)
 

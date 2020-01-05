@@ -11,7 +11,7 @@ import { getTheme } from '../cache/getTheme'
  */
 export const useTheme = () => {
   const theme = useContext(ReThemeContext)
-  theme.get = getTheme
+  theme.get = getTheme.bind(theme)
 
   return theme
 }
