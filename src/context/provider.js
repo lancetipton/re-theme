@@ -2,7 +2,6 @@
 'use strict'
 
 import React, { useEffect, useState } from 'react'
-import { isObj } from 'jsutils'
 import { ReThemeContext } from './context'
 import { Dimensions } from "ReDimensions"
 import { buildTheme, getDefaultTheme } from '../theme'

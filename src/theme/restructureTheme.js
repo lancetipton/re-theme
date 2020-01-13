@@ -133,7 +133,9 @@ const getPlatformTheme = (theme, platforms) => {
     // Otherwise check the values units
     platformTheme[key] = isObj(value)
       ? getPlatformTheme( mergePlatformOS(value, platforms), platforms)
-      : checkValueUnits(key, value)
+      : Platform.OS === 'web'
+        ? checkValueUnits(key, value)
+        : value
 
     // Return the update platformTheme object
     return platformTheme

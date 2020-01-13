@@ -1,6 +1,5 @@
 
 import { testTheme as theme, buttonTheme } from '../../mocks'
-import { isObj } from 'jsutils'
 
 jest.resetModules()
 

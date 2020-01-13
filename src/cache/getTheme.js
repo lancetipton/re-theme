@@ -1,4 +1,4 @@
-import { deepMerge, get, isArr, isObj, isStr } from 'jsutils'
+import { deepMerge, get, isObj, isStr } from 'jsutils'
 import { getCache, addCache, convertToId, createMemoId } from './cache'
 
 /**

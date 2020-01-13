@@ -490,7 +490,7 @@ var mergePlatformOS = function mergePlatformOS(theme, platforms) {
 var getPlatformTheme = function getPlatformTheme(theme, platforms) {
   if (!theme) return theme;
   return jsutils.reduceObj(theme, function (key, value, platformTheme) {
-    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms) : checkValueUnits(key, value);
+    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms) :  checkValueUnits(key, value) ;
     return platformTheme;
   }, theme);
 };
