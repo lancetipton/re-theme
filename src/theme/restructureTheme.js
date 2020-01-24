@@ -9,14 +9,16 @@ import { isObj, deepMerge, reduceObj, isEmpty, unset, get } from 'jsutils'
 
 // Default platforms to use when restructuring the theme
 // Use array, so we don't lose the order
-const defaultPlatforms = [
-  // Rules for the OS platform ( web || ios || android )
-  '$'+Platform.OS,
-  // Rules for the RePlatform ( web || native )
-  RePlatform,
-  // Rules for all platforms and os's
-  Constants.PLATFORM.ALL,
-]
+const getDefaultPlatforms = () => {
+  return [
+    // Rules for the OS platform ( web || ios || android )
+    '$'+Platform.OS,
+    // Rules for the RePlatform ( web || native )
+    RePlatform,
+    // Rules for all platforms and os's
+    Constants.PLATFORM.ALL,
+  ]
+}
 
 /**
  * Joins the passed in user platform with the default platforms array
@@ -28,7 +30,7 @@ const buildPlatforms = usrPlatforms => {
 
   const platsToUse = Object.keys(usrPlatforms).filter(key => usrPlatforms[key])
   
-  return defaultPlatforms.reduce((platforms, plat) => {
+  return getDefaultPlatforms().reduce((platforms, plat) => {
       usrPlatforms[plat] !== false &&
         platforms.indexOf(plat) === -1 &&
         platforms.unshift(plat)

@@ -42,6 +42,7 @@ export default Array
           ReDimensions: `src/dimensions/dimensions.${platform}.js`,
           RePlatform: `src/context/platform.${platform}.js`,
           ReJoinTheme: `src/cache/joinTheme.${platform}.js`,
+          ReHooks: `src/hooks/index.${platform}.js`,
         }
       })
     ]

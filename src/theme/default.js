@@ -10,9 +10,6 @@ import { buildTheme } from './buildTheme'
  */
 let defaultTheme = {}
 
-// Initial window dimensions
-const dims = Dimensions.get("window");
-
 /**
  * Overwrites the default them with passed in theme
  * If merge is passed as true, will merge the current default theme with the passed in theme
@@ -37,6 +34,7 @@ export const setDefaultTheme = (theme, merge=false) => {
     : theme
 
   // Get subset theme that matches current dimensions is useDimensions is true
+  const dims = Dimensions.get("window")
   const useTheme = buildTheme(defaultTheme, dims.width, dims.height)
 
   // Return the newly set default theme

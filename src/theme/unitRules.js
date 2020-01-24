@@ -1,5 +1,5 @@
 import { Constants } from '../constants'
-import { toStr, isNum, isObj, isStr, reduceObj } from 'jsutils'
+import { isNum, isObj, isStr, reduceObj } from 'jsutils'
 
 export const noUnitRules = {
   animationIterationCount: true,

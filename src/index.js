@@ -22,7 +22,7 @@ import {
   useThemeActive,
   useThemeFocus,
   useThemeHover,
-} from './hooks'
+} from 'ReHooks'
 
 export {
 

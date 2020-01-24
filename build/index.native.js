@@ -125,6 +125,24 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
+var Dimensions = {
+  get: function get() {
+    return reactNative.Dimensions.get.apply(reactNative.Dimensions, _toConsumableArray(param));
+  },
+  set: function set() {
+    return reactNative.Dimensions.set.apply(reactNative.Dimensions, _toConsumableArray(param));
+  },
+  update: function update() {
+    return reactNative.Dimensions.update.apply(reactNative.Dimensions, _toConsumableArray(param));
+  },
+  addEventListener: function addEventListener() {
+    return reactNative.Dimensions.addEventListener.apply(reactNative.Dimensions, _toConsumableArray(param));
+  },
+  removeEventListener: function removeEventListener() {
+    return reactNative.Dimensions.removeEventListener.apply(reactNative.Dimensions, _toConsumableArray(param));
+  }
+};
+
 var listeners = {};
 var addThemeEvent = function addThemeEvent(event, listener) {
   if (!event || !jsutils.isFunc(listener)) return;
@@ -299,9 +317,8 @@ var getSizeMap = function getSizeMap() {
   return sizeMap;
 };
 
-var dims = reactNative.Dimensions.get("window");
 var useDimensions = function useDimensions() {
-  var _useState = React.useState(dims),
+  var _useState = React.useState(Dimensions.get("window")),
       _useState2 = _slicedToArray(_useState, 2),
       dimensions = _useState2[0],
       setDimensions = _useState2[1];
@@ -319,9 +336,9 @@ var useDimensions = function useDimensions() {
     });
   };
   React.useEffect(function () {
-    reactNative.Dimensions.addEventListener("change", onChange);
+    Dimensions.addEventListener("change", onChange);
     return function () {
-      return reactNative.Dimensions.removeEventListener("change", onChange);
+      return Dimensions.removeEventListener("change", onChange);
     };
   }, []);
   return dimensions;
@@ -369,15 +386,17 @@ var checkValueUnits = function checkValueUnits(key, value) {
   return noUnitRules[key] || !jsutils.isNum(value) ? value : "".concat(value, "px");
 };
 
-var defaultPlatforms = [
-'$' + reactNative.Platform.OS,
-RePlatform,
-Constants.PLATFORM.ALL];
+var getDefaultPlatforms = function getDefaultPlatforms() {
+  return [
+  '$' + reactNative.Platform.OS,
+  RePlatform,
+  Constants.PLATFORM.ALL];
+};
 var buildPlatforms = function buildPlatforms(usrPlatforms) {
   var platsToUse = Object.keys(usrPlatforms).filter(function (key) {
     return usrPlatforms[key];
   });
-  return defaultPlatforms.reduce(function (platforms, plat) {
+  return getDefaultPlatforms().reduce(function (platforms, plat) {
     usrPlatforms[plat] !== false && platforms.indexOf(plat) === -1 && platforms.unshift(plat);
     return platforms;
   }, platsToUse);
@@ -458,12 +477,12 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme, usrPlat
 };
 
 var defaultTheme = {};
-var dims$1 = reactNative.Dimensions.get("window");
 var setDefaultTheme = function setDefaultTheme(theme) {
   var merge = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   if (!jsutils.isObj(theme)) return console.warn("setDefaultTheme method requires an theme object as the first argument. Received: ", theme);
   defaultTheme = merge ? jsutils.deepMerge(defaultTheme, theme) : theme;
-  var useTheme = buildTheme(defaultTheme, dims$1.width, dims$1.height);
+  var dims = Dimensions.get("window");
+  var useTheme = buildTheme(defaultTheme, dims.width, dims.height);
   return useTheme;
 };
 var getDefaultTheme = function getDefaultTheme() {
@@ -482,14 +501,13 @@ var withTheme = function withTheme(Component) {
   };
 };
 
-var dims$2 = reactNative.Dimensions.get("window");
 var ReThemeProvider = function ReThemeProvider(props) {
   var children = props.children,
       theme = props.theme,
       doMerge = props.merge,
       platforms = props.platforms;
   var merge = Boolean(doMerge || !doMerge && doMerge !== false) || false;
-  var _useState = React.useState(dims$2),
+  var _useState = React.useState(Dimensions.get("window")),
       _useState2 = _slicedToArray(_useState, 2),
       dimensions = _useState2[0],
       setDimensions = _useState2[1];
@@ -507,9 +525,9 @@ var ReThemeProvider = function ReThemeProvider(props) {
     });
   };
   React.useEffect(function () {
-    reactNative.Dimensions.addEventListener("change", onChange);
+    Dimensions.addEventListener("change", onChange);
     return function () {
-      return reactNative.Dimensions.removeEventListener("change", onChange);
+      return Dimensions.removeEventListener("change", onChange);
     };
   }, []);
   return React__default.createElement(ReThemeContext.Provider, {
@@ -523,101 +541,12 @@ var useTheme = function useTheme() {
   return theme;
 };
 
-var updateListeners = function updateListeners(element, type, events, methods) {
-  if (!jsutils.isObj(element) || !jsutils.isFunc(element[type])) return null;
-  element[type](events.on, methods.on);
-  element[type](events.off, methods.off);
-};
-var createCBRef = function createCBRef(hookRef, events, methods, ref) {
-  return React.useCallback(function (element) {
-    hookRef.current && updateListeners(hookRef.current, Constants.REMOVE_EVENT, events, methods);
-    hookRef.current = element;
-    hookRef.current && updateListeners(hookRef.current, Constants.ADD_EVENT, events, methods);
-    !hookRef.current && methods.cleanup();
-  }, [methods.on, methods.off]);
-};
-var createMethods = function createMethods(offValue, onValue, setValue) {
-  var cbWatchers = [onValue, offValue];
-  return {
-    off: React.useCallback(function () {
-      return setValue(offValue);
-    }, cbWatchers),
-    on: React.useCallback(function () {
-      return setValue(onValue);
-    }, cbWatchers),
-    cleanup: function cleanup(methods) {
-      if (!methods) return;
-      jsutils.isFunc(methods.on) && methods.on(undefined);
-      jsutils.isFunc(methods.off) && methods.off(undefined);
-      onValue = undefined;
-      offValue = undefined;
-      setValue = undefined;
-      methods = undefined;
-    }
-  };
-};
-var getOptions = function getOptions() {
-  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  return options && !jsutils.isObj(options) ? {} : options;
-};
-var checkJoinValues = function checkJoinValues(offValue, onValue, valueOn, noMerge) {
-  return noMerge || !jsutils.isColl(onValue) || !jsutils.isColl(offValue) ? valueOn : jsutils.deepMerge(offValue, onValue);
-};
-var hookFactory = function hookFactory(events) {
-  return (
-    function (offValue, onValue) {
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-      var _getOptions = getOptions(options),
-          ref = _getOptions.ref,
-          noMerge = _getOptions.noMerge;
-      var hookRef = ref || React.useRef();
-      var _useState = React.useState(offValue),
-          _useState2 = _slicedToArray(_useState, 2),
-          value = _useState2[0],
-          setValue = _useState2[1];
-      var _useState3 = React.useState(checkJoinValues(offValue, onValue, onValue, noMerge)),
-          _useState4 = _slicedToArray(_useState3, 1),
-          activeValue = _useState4[0];
-      var elementRef = createCBRef(
-      hookRef,
-      events,
-      createMethods(offValue, activeValue, setValue));
-      if (jsutils.isFunc(ref)) {
-        var useValue = offValue === value ? value
-        : value === activeValue
-        ? checkJoinValues(offValue, onValue, activeValue, noMerge) : offValue;
-        var wrapRef = function wrapRef(element) {
-          ref(element);
-          elementRef(element);
-        };
-        return [wrapRef, useValue];
-      }
-      return [elementRef, value, setValue];
-    }
-  );
+var noOp = function noOp() {};
+var noHook = function noHook(arg1) {
+  return [undefined, arg1, noOp];
 };
 
-var useThemeHover = hookFactory({
-  on: 'mouseenter',
-  off: 'mouseleave'
-});
-
-var useThemeActive = hookFactory({
-  on: 'mousedown',
-  off: 'mouseup'
-});
-
-var useThemeFocus = hookFactory({
-  on: 'focus',
-  off: 'blur'
-});
-
-Object.defineProperty(exports, 'Dimensions', {
-  enumerable: true,
-  get: function () {
-    return reactNative.Dimensions;
-  }
-});
+exports.Dimensions = Dimensions;
 exports.ReThemeContext = ReThemeContext;
 exports.ReThemeProvider = ReThemeProvider;
 exports.addThemeEvent = addThemeEvent;
@@ -631,7 +560,7 @@ exports.setDefaultTheme = setDefaultTheme;
 exports.setSizes = setSizes;
 exports.useDimensions = useDimensions;
 exports.useTheme = useTheme;
-exports.useThemeActive = useThemeActive;
-exports.useThemeFocus = useThemeFocus;
-exports.useThemeHover = useThemeHover;
+exports.useThemeActive = noHook;
+exports.useThemeFocus = noHook;
+exports.useThemeHover = noHook;
 exports.withTheme = withTheme;

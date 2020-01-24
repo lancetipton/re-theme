@@ -5,14 +5,13 @@ import React, { useState, useEffect } from "react"
 import { Dimensions } from "ReDimensions"
 
 // Get the original window dimensions
-const dims = Dimensions.get("window")
 
 export const useDimensions = () => {
 
   /**
    * Set the original dimensions to the state hook
    */
-  const [ dimensions, setDimensions ] = useState(dims)
+  const [ dimensions, setDimensions ] = useState(Dimensions.get("window"))
   
   /**
    * onChange listener for when the screen size changes

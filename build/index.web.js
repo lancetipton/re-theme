@@ -377,9 +377,8 @@ var getSizeMap = function getSizeMap() {
   return sizeMap;
 };
 
-var dims = Dimensions.get("window");
 var useDimensions = function useDimensions() {
-  var _useState = React.useState(dims),
+  var _useState = React.useState(Dimensions.get("window")),
       _useState2 = _slicedToArray(_useState, 2),
       dimensions = _useState2[0],
       setDimensions = _useState2[1];
@@ -454,15 +453,17 @@ var checkValueUnits = function checkValueUnits(key, value) {
   return noUnitRules[key] || !jsutils.isNum(value) ? value : "".concat(value, "px");
 };
 
-var defaultPlatforms = [
-'$' + Platform.OS,
-RePlatform,
-Constants.PLATFORM.ALL];
+var getDefaultPlatforms = function getDefaultPlatforms() {
+  return [
+  '$' + Platform.OS,
+  RePlatform,
+  Constants.PLATFORM.ALL];
+};
 var buildPlatforms = function buildPlatforms(usrPlatforms) {
   var platsToUse = Object.keys(usrPlatforms).filter(function (key) {
     return usrPlatforms[key];
   });
-  return defaultPlatforms.reduce(function (platforms, plat) {
+  return getDefaultPlatforms().reduce(function (platforms, plat) {
     usrPlatforms[plat] !== false && platforms.indexOf(plat) === -1 && platforms.unshift(plat);
     return platforms;
   }, platsToUse);
@@ -543,12 +544,12 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme, usrPlat
 };
 
 var defaultTheme = {};
-var dims$1 = Dimensions.get("window");
 var setDefaultTheme = function setDefaultTheme(theme) {
   var merge = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   if (!jsutils.isObj(theme)) return console.warn("setDefaultTheme method requires an theme object as the first argument. Received: ", theme);
   defaultTheme = merge ? jsutils.deepMerge(defaultTheme, theme) : theme;
-  var useTheme = buildTheme(defaultTheme, dims$1.width, dims$1.height);
+  var dims = Dimensions.get("window");
+  var useTheme = buildTheme(defaultTheme, dims.width, dims.height);
   return useTheme;
 };
 var getDefaultTheme = function getDefaultTheme() {
@@ -567,14 +568,13 @@ var withTheme = function withTheme(Component) {
   };
 };
 
-var dims$2 = Dimensions.get("window");
 var ReThemeProvider = function ReThemeProvider(props) {
   var children = props.children,
       theme = props.theme,
       doMerge = props.merge,
       platforms = props.platforms;
   var merge = Boolean(doMerge || !doMerge && doMerge !== false) || false;
-  var _useState = React.useState(dims$2),
+  var _useState = React.useState(Dimensions.get("window")),
       _useState2 = _slicedToArray(_useState, 2),
       dimensions = _useState2[0],
       setDimensions = _useState2[1];

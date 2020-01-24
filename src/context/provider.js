@@ -6,9 +6,6 @@ import { ReThemeContext } from './context'
 import { Dimensions } from "ReDimensions"
 import { buildTheme, getDefaultTheme } from '../theme'
 
-// Get the original window dimensions
-const dims = Dimensions.get("window")
-
 /**
  * Context Provider used to set the theme.
  * <br/> All children that use the withTheme function will have access to the passed in theme prop
@@ -26,7 +23,7 @@ export const ReThemeProvider = props => {
   /**
    * Set the original dimensions to the state hook
    */
-  const [ dimensions, setDimensions ] = useState(dims)
+  const [ dimensions, setDimensions ] = useState(Dimensions.get("window"))
   
   /**
    * onChange listener for when the screen size changes
