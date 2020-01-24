@@ -127,19 +127,19 @@ function _nonIterableRest() {
 
 var Dimensions = {
   get: function get() {
-    return reactNative.Dimensions.get.apply(reactNative.Dimensions, _toConsumableArray(param));
+    return reactNative.Dimensions.get.apply(reactNative.Dimensions, arguments);
   },
   set: function set() {
-    return reactNative.Dimensions.set.apply(reactNative.Dimensions, _toConsumableArray(param));
+    return reactNative.Dimensions.set.apply(reactNative.Dimensions, arguments);
   },
   update: function update() {
-    return reactNative.Dimensions.update.apply(reactNative.Dimensions, _toConsumableArray(param));
+    return reactNative.Dimensions.update.apply(reactNative.Dimensions, arguments);
   },
   addEventListener: function addEventListener() {
-    return reactNative.Dimensions.addEventListener.apply(reactNative.Dimensions, _toConsumableArray(param));
+    return reactNative.Dimensions.addEventListener.apply(reactNative.Dimensions, arguments);
   },
   removeEventListener: function removeEventListener() {
-    return reactNative.Dimensions.removeEventListener.apply(reactNative.Dimensions, _toConsumableArray(param));
+    return reactNative.Dimensions.removeEventListener.apply(reactNative.Dimensions, arguments);
   }
 };
 
