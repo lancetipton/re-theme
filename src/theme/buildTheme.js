@@ -76,8 +76,7 @@ export const buildTheme = (theme, width, height, defaultTheme, usrPlatform) => {
 
   // Pull out the key and the size that matches the width
   const [ key, size ] = getSize(width)
-  
-  
+
   const mergedTheme = mergeWithDefault(theme, defaultTheme, usrPlatform)
 
   // Extract the sizes from the theme

@@ -227,7 +227,7 @@ var addThemeEvent = function addThemeEvent(event, listener) {
 };
 var removeThemeEvent = function removeThemeEvent(event, removeListener) {
   if (!event || !listeners$1[event] || !removeListener && removeListener !== 0) return;
-  isNum(removeListener)
+  jsutils.isNum(removeListener)
   ? listeners$1[event].splice(removeListener, 1)
   : jsutils.isFunc(removeListener) && jsutils.isArr(listeners$1[event]) && (listeners$1[event] = listeners$1[event].filter(function (listener) {
     return listener !== removeListener;
@@ -526,23 +526,36 @@ var withTheme = function withTheme(Component) {
   };
 };
 
+var currentTheme = {};
+var updateCurrentTheme = function updateCurrentTheme(updatedTheme) {
+  return currentTheme = updatedTheme;
+};
 var ReThemeProvider = function ReThemeProvider(props) {
   var children = props.children,
       theme = props.theme,
       doMerge = props.merge,
-      platforms = props.platforms;
+      platforms = props.platforms,
+      logRenders = props.logRenders;
   var merge = Boolean(doMerge || !doMerge && doMerge !== false) || false;
   var _useState = React.useState(Dimensions.get("window")),
       _useState2 = _slicedToArray(_useState, 2),
       dimensions = _useState2[0],
       setDimensions = _useState2[1];
+  var _useState3 = React.useState(false),
+      _useState4 = _slicedToArray(_useState3, 2),
+      hasListener = _useState4[0],
+      setListener = _useState4[1];
   var onChange = function onChange(_ref) {
     var win = _ref.window;
     var width = win.width,
         height = win.height,
         scale = win.scale,
         fontScale = win.fontScale;
-    setDimensions({
+    var changeToSize = getSize(width);
+    if (!changeToSize) return;
+    var sizeToBe = changeToSize[0];
+    var currentSize = jsutils.get(currentTheme, ['RTMeta', 'key']);
+    sizeToBe !== currentSize && setDimensions({
       width: width,
       height: height,
       scale: scale,
@@ -550,11 +563,18 @@ var ReThemeProvider = function ReThemeProvider(props) {
     });
   };
   React.useEffect(function () {
-    Dimensions.addEventListener("change", onChange);
+    if (!hasListener) {
+      Dimensions.addEventListener("change", onChange);
+      addThemeEvent(Constants.BUILD_EVENT, updateCurrentTheme);
+      setListener(true);
+    }
     return function () {
-      return Dimensions.removeEventListener("change", onChange);
+      Dimensions.removeEventListener("change", onChange);
+      removeThemeEvent(Constants.BUILD_EVENT, updateCurrentTheme);
+      currentTheme = {};
     };
   }, []);
+  logRenders && console.log("---------- RE-THEME RE-RENDER ----------");
   return React__default.createElement(ReThemeContext.Provider, {
     value: buildTheme(theme, dimensions.width, dimensions.height, merge && getDefaultTheme(), platforms)
   }, children);
