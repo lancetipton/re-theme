@@ -28,32 +28,21 @@ export const getTheme = function (id, ...sources){
   // If id is a ref to styles on theme, add them to the sources array
   const sourceStyles = !styleFromId ? sources : [ styleFromId, ...sources ]
 
-  // Get the memo id, or use the sources to build the id
-  const memoId = isStr(id) ? id : convertToId(sources)
-
-  // If no memo id can be found, just return
-  if(!memoId)
-    return console.error(`theme.get requires an ID or array or string sources!`, id, sources) || {}
-
-  // Check if cache exists for the id
-  const cache = getCache(memoId)
-  if(cache) return cache
-
   // Build the styles by merging the sources together
   // Check if each source is an id to cache or get the styles from the theme
   const styles = deepMerge(
     ...sourceStyles.reduce((toMerge, source) => {
       const styles = isObj(source)
         ? source
-        : source && (getCache(createMemoId(source)) || get(this, source))
+        : isStr(source)
+          ? get(this, source)
+          : null
 
       styles && toMerge.push(styles)
 
       return toMerge
     }, [])
   )
-
-  addCache(memoId, styles)
 
   return styles
 

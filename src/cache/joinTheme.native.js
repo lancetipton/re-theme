@@ -1,4 +1,4 @@
-import { addCache, checkCache, buildCacheObj } from './cache'
+import { buildCacheObj } from './cache'
 
 /**
  * Joins rules from the theme together. Accepts unlimited rules objects
@@ -11,13 +11,5 @@ import { addCache, checkCache, buildCacheObj } from './cache'
  * @returns {Object} - Joined theme rules
  */
 export const join = (arg1, arg2, ...sources) => {
-
-  const { memoId, cache } = checkCache(sources)
-  if(cache) return cache
-
-  const builtStyles = buildCacheObj(arg1, arg2, sources)
-
-  memoId && addCache(memoId, builtStyles)
-
-  return builtStyles
+  return buildCacheObj(arg1, arg2, sources)
 }

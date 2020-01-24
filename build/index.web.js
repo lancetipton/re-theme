@@ -246,42 +246,11 @@ var joinCache = {};
 addThemeEvent && addThemeEvent(Constants.BUILD_EVENT, function () {
   return clearCache();
 });
-var strArrToId = function strArrToId(arr) {
-  return arr.join('-').replace(/\./g, '-');
-};
-var createMemoId = function createMemoId(item) {
-  return jsutils.isArr(item) && jsutils.isStr(item[0]) ? strArrToId(item) : jsutils.isStr(item) && item;
-};
-var convertToId = function convertToId(sources) {
-  return jsutils.isArr(sources) && sources.reduce(function (memoId, source) {
-    var addToId = createMemoId(source);
-    return !addToId ? memoId : memoId && "".concat(memoId, "-").concat(addToId) || addToId;
-  }, '') || false;
-};
 var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
   return jsutils.isObj(arg1) && jsutils.isObj(arg1.RTMeta) && jsutils.isArr(arg2);
 };
-var checkMemoId = function checkMemoId(sources) {
-  var idLocation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'end';
-  var memoId = sources[idLocation !== 'end' ? 'shift' : 'pop']();
-  return jsutils.isObj(memoId) ? sources[idLocation !== 'end' ? 'unshift' : 'push'](memoId) && false : createMemoId(memoId);
-};
 var clearCache = function clearCache(key) {
   return key ? jsutils.unset(joinCache, [key]) : joinCache = {};
-};
-var getCache = function getCache(key) {
-  return key ? joinCache[key] : joinCache;
-};
-var addCache = function addCache(key, cache) {
-  return key && cache && (joinCache[key] = cache);
-};
-var checkCache = function checkCache(sources) {
-  var idLocation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'end';
-  var memoId = checkMemoId(sources, idLocation);
-  return {
-    memoId: memoId,
-    cache: memoId && getCache(memoId)
-  };
 };
 var buildCacheObj = function buildCacheObj(arg1, arg2, sources) {
   return hasManyFromTheme(arg1, arg2) ? jsutils.deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
@@ -293,13 +262,7 @@ var join = function join(arg1, arg2) {
   for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
     sources[_key - 2] = arguments[_key];
   }
-  var _checkCache = checkCache(sources),
-      memoId = _checkCache.memoId,
-      cache = _checkCache.cache;
-  if (cache) return cache;
-  var builtStyles = buildCacheObj(arg1, arg2, sources);
-  memoId && addCache(memoId, builtStyles);
-  return builtStyles;
+  return buildCacheObj(arg1, arg2, sources);
 };
 
 var checkIdForStyle = function checkIdForStyle(theme, id) {
@@ -312,16 +275,11 @@ var getTheme = function getTheme(id) {
     sources[_key - 1] = arguments[_key];
   }
   var sourceStyles = !styleFromId ? sources : [styleFromId].concat(sources);
-  var memoId = jsutils.isStr(id) ? id : convertToId(sources);
-  if (!memoId) return console.error("theme.get requires an ID or array or string sources!", id, sources) || {};
-  var cache = getCache(memoId);
-  if (cache) return cache;
   var styles = jsutils.deepMerge.apply(void 0, _toConsumableArray(sourceStyles.reduce(function (toMerge, source) {
-    var styles = jsutils.isObj(source) ? source : source && (getCache(createMemoId(source)) || jsutils.get(_this, source));
+    var styles = jsutils.isObj(source) ? source : jsutils.isStr(source) ? jsutils.get(_this, source) : null;
     styles && toMerge.push(styles);
     return toMerge;
   }, [])));
-  addCache(memoId, styles);
   return styles;
 };
 
