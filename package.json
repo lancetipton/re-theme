@@ -14,13 +14,13 @@
   },
   "devDependencies": {
     "@babel/core": "7.5.5",
-    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "7.5.5",
     "@babel/preset-env": "7.5.5",
     "@babel/preset-react": "7.6.3",
     "@rollup/plugin-alias": "2.2.0",
     "babel-jest": "24.9.0",
     "jest": "24.7.1",
-    "jsutils": "git+https://github.com/lancetipton/jsutils.git",
+    "jsutils": "git+https://github.com/lancetipton/jsutils.git#v3.2.1",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-native": "0.61.1",
@@ -36,7 +36,7 @@
     "rollup-plugin-terser": "5.1.2"
   },
   "peerDependencies": {
-    "jsutils": "git+https://github.com/lancetipton/jsutils.git",
+    "jsutils": "git+https://github.com/lancetipton/jsutils.git#v3.2.1",
     "react": "16.9.0"
   },
   "optionalDependencies": {
