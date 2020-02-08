@@ -364,7 +364,7 @@ var useDimensions = function useDimensions() {
 };
 
 var RePlatform = Constants.PLATFORM.WEB;
-var Platform$1 = {
+var Platform = {
   OS: 'web',
   select: function select(obj) {
     return jsutils.isObj(obj) && obj.web;
@@ -373,7 +373,7 @@ var Platform$1 = {
 };
 var setRNPlatform = function setRNPlatform() {};
 var getRNPlatform = function getRNPlatform() {
-  return Platform$1;
+  return Platform;
 };
 
 var noUnitRules = {
@@ -453,19 +453,21 @@ var mergePlatformOS = function mergePlatformOS(theme, platforms) {
   return toMerge.length ? jsutils.deepMerge.apply(void 0, [{}].concat(_toConsumableArray(toMerge))) : theme;
 };
 var getPlatformTheme = function getPlatformTheme(theme, platforms) {
+  var Platform = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   if (!theme) return theme;
   return jsutils.reduceObj(theme, function (key, value, platformTheme) {
-    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms) : Platform.OS === 'web' ? checkValueUnits(key, value) : value;
+    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms, Platform) : Platform && Platform.OS === 'web' ? checkValueUnits(key, value) : value;
     return platformTheme;
   }, theme);
 };
 var restructureTheme = function restructureTheme(theme) {
   var usrPlatform = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var Platform = getRNPlatform();
   return Object.keys(getSizeMap().hash).reduce(function (updatedTheme, size) {
     var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
     if (!jsutils.isEmpty(builtSize)) updatedTheme[size] = builtSize;
     return updatedTheme;
-  }, getPlatformTheme(theme, buildPlatforms(usrPlatform)));
+  }, getPlatformTheme(theme, buildPlatforms(usrPlatform), Platform));
 };
 
 var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {

@@ -128,7 +128,7 @@ const mergePlatformOS = (theme, platforms) => {
  *
  * @returns {Object} - Update theme object with platform keys updated
  */
-const getPlatformTheme = (theme, platforms) => {
+const getPlatformTheme = (theme, platforms, Platform={}) => {
   if(!theme) return theme
 
   return reduceObj(theme, (key, value, platformTheme) => {
@@ -136,8 +136,8 @@ const getPlatformTheme = (theme, platforms) => {
     // If it is make call to merge platform specific styles, and recursively call self
     // Otherwise check the values units
     platformTheme[key] = isObj(value)
-      ? getPlatformTheme( mergePlatformOS(value, platforms), platforms)
-      : Platform.OS === 'web'
+      ? getPlatformTheme(mergePlatformOS(value, platforms), platforms, Platform)
+      : Platform && Platform.OS === 'web'
         ? checkValueUnits(key, value)
         : value
 
@@ -164,6 +164,7 @@ const getPlatformTheme = (theme, platforms) => {
  * @returns {Object} - sized theme object with sizes moved to root size object
  */
 export const restructureTheme = (theme, usrPlatform={}) => {
+  const Platform = getRNPlatform()
 
   // Use the theme based on the platform if it exists
   // Pass in the response after the sizes are set
@@ -178,6 +179,6 @@ export const restructureTheme = (theme, usrPlatform={}) => {
       if(!isEmpty(builtSize)) updatedTheme[size] = builtSize
 
       return updatedTheme
-    }, getPlatformTheme(theme, buildPlatforms(usrPlatform)))
+    }, getPlatformTheme(theme, buildPlatforms(usrPlatform), Platform))
 
 }
