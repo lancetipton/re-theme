@@ -7,7 +7,6 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var React = require('react');
 var React__default = _interopDefault(React);
 var jsutils = require('jsutils');
-var reactNative = require('react-native');
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -125,21 +124,33 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
+var RNDimensions;
+var setRNDimensions = function setRNDimensions(dims) {
+  RNDimensions = dims;
+};
 var Dimensions = {
   get: function get() {
-    return reactNative.Dimensions.get.apply(reactNative.Dimensions, arguments);
+    var _RNDimensions;
+    return RNDimensions ? (_RNDimensions = RNDimensions).get.apply(_RNDimensions, arguments) : {
+      width: 0,
+      height: 0
+    };
   },
   set: function set() {
-    return reactNative.Dimensions.set.apply(reactNative.Dimensions, arguments);
+    var _RNDimensions2;
+    RNDimensions && (_RNDimensions2 = RNDimensions).set.apply(_RNDimensions2, arguments);
   },
   update: function update() {
-    return reactNative.Dimensions.update.apply(reactNative.Dimensions, arguments);
+    var _RNDimensions3;
+    RNDimensions && (_RNDimensions3 = RNDimensions).update.apply(_RNDimensions3, arguments);
   },
   addEventListener: function addEventListener() {
-    return reactNative.Dimensions.addEventListener.apply(reactNative.Dimensions, arguments);
+    var _RNDimensions4;
+    RNDimensions && (_RNDimensions4 = RNDimensions).addEventListener.apply(_RNDimensions4, arguments);
   },
   removeEventListener: function removeEventListener() {
-    return reactNative.Dimensions.removeEventListener.apply(reactNative.Dimensions, arguments);
+    var _RNDimensions5;
+    RNDimensions && (_RNDimensions5 = RNDimensions).removeEventListener.apply(_RNDimensions5, arguments);
   }
 };
 
@@ -302,6 +313,13 @@ var useDimensions = function useDimensions() {
   return dimensions;
 };
 
+var RNPlatform;
+var getRNPlatform = function getRNPlatform() {
+  return RNPlatform;
+};
+var setRNPlatform = function setRNPlatform(Plat) {
+  RNPlatform = Plat;
+};
 var RePlatform = Constants.PLATFORM.NATIVE;
 
 var noUnitRules = {
@@ -345,8 +363,9 @@ var checkValueUnits = function checkValueUnits(key, value) {
 };
 
 var getDefaultPlatforms = function getDefaultPlatforms() {
+  var Platform = getRNPlatform();
   return [
-  '$' + reactNative.Platform.OS,
+  '$' + jsutils.get(Platform, 'OS'),
   RePlatform,
   Constants.PLATFORM.ALL];
 };
@@ -382,7 +401,7 @@ var mergePlatformOS = function mergePlatformOS(theme, platforms) {
 var getPlatformTheme = function getPlatformTheme(theme, platforms) {
   if (!theme) return theme;
   return jsutils.reduceObj(theme, function (key, value, platformTheme) {
-    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms) : reactNative.Platform.OS === 'web' ? checkValueUnits(key, value) : value;
+    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms) : Platform.OS === 'web' ? checkValueUnits(key, value) : value;
     return platformTheme;
   }, theme);
 };
@@ -539,6 +558,8 @@ exports.getSize = getSize;
 exports.getSizeMap = getSizeMap;
 exports.removeThemeEvent = removeThemeEvent;
 exports.setDefaultTheme = setDefaultTheme;
+exports.setRNDimensions = setRNDimensions;
+exports.setRNPlatform = setRNPlatform;
 exports.setSizes = setSizes;
 exports.useDimensions = useDimensions;
 exports.useTheme = useTheme;

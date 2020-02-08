@@ -3,16 +3,18 @@
 
 import { getSizeMap } from '../dimensions'
 import { Constants } from '../constants'
-import { RePlatform, Platform } from 'RePlatform'
+import { RePlatform, getRNPlatform } from 'RePlatform'
 import { checkValueUnits } from './unitRules'
 import { isObj, deepMerge, reduceObj, isEmpty, unset, get } from 'jsutils'
 
 // Default platforms to use when restructuring the theme
 // Use array, so we don't lose the order
 const getDefaultPlatforms = () => {
+  const Platform = getRNPlatform()
+
   return [
     // Rules for the OS platform ( web || ios || android )
-    '$'+Platform.OS,
+    '$'+ get(Platform, 'OS'),
     // Rules for the RePlatform ( web || native )
     RePlatform,
     // Rules for all platforms and os's

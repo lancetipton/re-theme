@@ -150,6 +150,9 @@ const removeEventListener = (type, removeListener) => {
 
 domAccess && addListener(window, Constants.RESIZE_EVENT, debounce(update, DEBOUNCE_RATE))
 
+
+export const setRNDimensions = () => {}
+
 export const Dimensions = {
   get,
   set,

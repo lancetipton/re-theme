@@ -210,6 +210,7 @@ var removeEventListener = function removeEventListener(type, removeListener) {
   }));
 };
 domAccess && addListener(window, Constants.RESIZE_EVENT, jsutils.debounce(update, DEBOUNCE_RATE));
+var setRNDimensions = function setRNDimensions() {};
 var Dimensions = {
   get: get,
   set: set,
@@ -363,12 +364,16 @@ var useDimensions = function useDimensions() {
 };
 
 var RePlatform = Constants.PLATFORM.WEB;
-var Platform = {
+var Platform$1 = {
   OS: 'web',
   select: function select(obj) {
     return jsutils.isObj(obj) && obj.web;
   },
   Version: 'ReTheme'
+};
+var setRNPlatform = function setRNPlatform() {};
+var getRNPlatform = function getRNPlatform() {
+  return Platform$1;
 };
 
 var noUnitRules = {
@@ -412,8 +417,9 @@ var checkValueUnits = function checkValueUnits(key, value) {
 };
 
 var getDefaultPlatforms = function getDefaultPlatforms() {
+  var Platform = getRNPlatform();
   return [
-  '$' + Platform.OS,
+  '$' + jsutils.get(Platform, 'OS'),
   RePlatform,
   Constants.PLATFORM.ALL];
 };
@@ -449,7 +455,7 @@ var mergePlatformOS = function mergePlatformOS(theme, platforms) {
 var getPlatformTheme = function getPlatformTheme(theme, platforms) {
   if (!theme) return theme;
   return jsutils.reduceObj(theme, function (key, value, platformTheme) {
-    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms) :  checkValueUnits(key, value) ;
+    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms) : Platform.OS === 'web' ? checkValueUnits(key, value) : value;
     return platformTheme;
   }, theme);
 };
@@ -686,6 +692,8 @@ exports.getSize = getSize;
 exports.getSizeMap = getSizeMap;
 exports.removeThemeEvent = removeThemeEvent;
 exports.setDefaultTheme = setDefaultTheme;
+exports.setRNDimensions = setRNDimensions;
+exports.setRNPlatform = setRNPlatform;
 exports.setSizes = setSizes;
 exports.useDimensions = useDimensions;
 exports.useTheme = useTheme;

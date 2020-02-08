@@ -1,9 +1,26 @@
-import { Dimensions as RNDimensions } from "react-native"
+
+let RNDimensions
+
+export const setRNDimensions = dims => {
+  RNDimensions = dims
+}
 
 export const Dimensions = {
-  get: (...params) => RNDimensions.get(...params),
-  set: (...params) => RNDimensions.set(...params),
-  update: (...params) => RNDimensions.update(...params),
-  addEventListener: (...params) => RNDimensions.addEventListener(...params),
-  removeEventListener: (...params) => RNDimensions.removeEventListener(...params)
+  get: (...params) => {
+    return RNDimensions
+      ? RNDimensions.get(...params)
+      : { width: 0, height: 0 }
+  },
+  set: (...params) => {
+    RNDimensions && RNDimensions.set(...params)
+  },
+  update: (...params) => {
+    RNDimensions && RNDimensions.update(...params)
+  },
+  addEventListener: (...params) => {
+    RNDimensions && RNDimensions.addEventListener(...params)
+  },
+  removeEventListener: (...params) => {
+    RNDimensions && RNDimensions.removeEventListener(...params)
+  }
 }

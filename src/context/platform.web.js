@@ -8,7 +8,12 @@ const Platform = {
   Version: 'ReTheme'
 }
 
+const setRNPlatform = () => {}
+const getRNPlatform = () => { return Platform }
+
 export {
+  setRNPlatform,
+  getRNPlatform,
   RePlatform,
   Platform
 }

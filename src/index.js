@@ -6,7 +6,8 @@ import {
   setSizes,
   useDimensions,
 } from './dimensions'
-import { Dimensions } from "ReDimensions"
+import { Dimensions, setRNDimensions } from "ReDimensions"
+import { setRNPlatform } from "RePlatform"
 
 import {
   addThemeEvent,
@@ -28,6 +29,8 @@ export {
 
   // Dimensions exports
   Dimensions,
+  setRNDimensions,
+  setRNPlatform,
   getSize,
   getSizeMap,
   getMergeSizes,
