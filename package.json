@@ -5,6 +5,7 @@
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "repository": "https://github.com/lancetipton/ReTheme",
+  "homepage" : "https://simpleviewinc.github.io/sv-re-theme",
   "author": "Lance Tipton",
   "license": "MIT",
   "files": [
@@ -13,13 +14,13 @@
   ],
   "scripts": {
     "build": "yarn clean:build; rollup -c rollup.config.js",
-    "build:app": "yarn clean:docs; cd app; yarn build",
+    "build:app": "cd app; yarn build",
     "clean:build": "rimraf build; mkdir build; mkdir build/cjs; mkdir build/esm; yarn copy:indexes",
-    "clean:docs": "rimraf ./docs",
     "copy:indexes": "cp ./index.cjs.js build/cjs/index.js; cp ./index.esm.js build/esm/index.js",
-    "deploy": "yarn build; gh-pages -d docs",
+    "predeploy": "yarn build:app",
+    "deploy": "gh-pages -d docs",
     "dev": "yarn clean:build; rollup -c rollup.config.js -w",
-    "app": "yarn build; cd app; yarn start",
+    "app": "cd app; yarn start",
     "start": "yarn dev",
     "test": "NODE_ENV=test jest --no-cache --verbose"
   },
@@ -51,11 +52,6 @@
   "peerDependencies": {
     "jsutils": "git+https://github.com/lancetipton/jsutils.git#v3.2.1",
     "react": "16.9.0"
-  },
-  "optionalDependencies": {
-    "react-dom": "16.9.0",
-    "react-native": "0.61.1",
-    "react-native-web": "0.11.7"
   },
   "jest": {
     "preset": "rollup-jest",
