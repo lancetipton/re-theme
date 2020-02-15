@@ -124,6 +124,60 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
+var RNDimensions;
+var setRNDimensions = function setRNDimensions(dims) {
+  RNDimensions = dims;
+};
+var Dimensions = {
+  get: function get() {
+    var _RNDimensions;
+    return RNDimensions ? (_RNDimensions = RNDimensions).get.apply(_RNDimensions, arguments) : {
+      width: 0,
+      height: 0
+    };
+  },
+  set: function set() {
+    var _RNDimensions2;
+    RNDimensions && (_RNDimensions2 = RNDimensions).set.apply(_RNDimensions2, arguments);
+  },
+  update: function update() {
+    var _RNDimensions3;
+    RNDimensions && (_RNDimensions3 = RNDimensions).update.apply(_RNDimensions3, arguments);
+  },
+  addEventListener: function addEventListener() {
+    var _RNDimensions4;
+    RNDimensions && (_RNDimensions4 = RNDimensions).addEventListener.apply(_RNDimensions4, arguments);
+  },
+  removeEventListener: function removeEventListener() {
+    var _RNDimensions5;
+    RNDimensions && (_RNDimensions5 = RNDimensions).removeEventListener.apply(_RNDimensions5, arguments);
+  }
+};
+
+var listeners = {};
+var addThemeEvent = function addThemeEvent(event, listener) {
+  if (!event || !jsutils.isFunc(listener)) return;
+  listeners[event] = listeners[event] || [];
+  listeners[event].push(listener);
+  return listeners[event].length - 1;
+};
+var removeThemeEvent = function removeThemeEvent(event, removeListener) {
+  if (!event || !listeners[event] || !removeListener && removeListener !== 0) return;
+  jsutils.isNum(removeListener)
+  ? listeners[event].splice(removeListener, 1)
+  : jsutils.isFunc(removeListener) && jsutils.isArr(listeners[event]) && (listeners[event] = listeners[event].filter(function (listener) {
+    return listener !== removeListener;
+  }));
+};
+var fireThemeEvent = function fireThemeEvent(event) {
+  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    params[_key - 1] = arguments[_key];
+  }
+  jsutils.isArr(listeners[event]) && listeners[event].forEach(function (listener) {
+    return listener.apply(void 0, params);
+  });
+};
+
 var Constants = jsutils.deepFreeze({
   BUILD_EVENT: 'build',
   CHANGE_EVENT: 'change',
@@ -138,110 +192,6 @@ var Constants = jsutils.deepFreeze({
   },
   CSS_UNITS: ['%', 'cm', 'ch', 'em', 'rem', 'ex', 'in', 'mm', 'pc', 'pt', 'px', 'vw', 'vh', 'vmin', 'vmax']
 });
-
-var DEBOUNCE_RATE = 100;
-var hasDomAccess = function hasDomAccess() {
-  return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
-};
-var domAccess = hasDomAccess();
-var getWindow = function getWindow() {
-  var winAccess = !hasDomAccess();
-  return winAccess ? {
-    devicePixelRatio: undefined,
-    innerHeight: undefined,
-    innerWidth: undefined,
-    screen: {
-      height: undefined,
-      width: undefined
-    }
-  } : function () {
-    return window;
-  }();
-};
-var winDim = getWindow();
-var addListener = function addListener(element, event, method, options) {
-  element && jsutils.checkCall(element.addEventListener, event, method, options || false);
-};
-var setScreen = function setScreen(win) {
-  return {
-    fontScale: 1,
-    height: win.screen.height,
-    scale: win.devicePixelRatio || 1,
-    width: win.screen.width
-  };
-};
-var setWin = function setWin(win) {
-  return {
-    fontScale: 1,
-    height: win.innerHeight,
-    scale: win.devicePixelRatio || 1,
-    width: win.innerWidth
-  };
-};
-var dimensions = {
-  window: setWin(winDim),
-  screen: setScreen(winDim)
-};
-var listeners = {};
-var get = function get(dimension) {
-  return dimensions[dimension];
-};
-var set = function set(_ref) {
-  var screen = _ref.screen,
-      win = _ref.window;
-  if (screen) dimensions.screen = screen;
-  if (win) dimensions.window = win;
-};
-var update = function update() {
-  dimensions.window = setWin(winDim);
-  dimensions.screen = setScreen(winDim);
-  jsutils.isArr(listeners[Constants.CHANGE_EVENT]) && listeners[Constants.CHANGE_EVENT].forEach(function (listener) {
-    return listener(dimensions);
-  });
-};
-var addEventListener = function addEventListener(type, listener) {
-  if (!type || !jsutils.isFunc(listener)) return;
-  listeners[type] = listeners[type] || [];
-  listeners[type].push(listener);
-};
-var removeEventListener = function removeEventListener(type, removeListener) {
-  type && jsutils.isFunc(removeListener) && jsutils.isArr(listeners[type]) && (listeners[type] = listeners[type].filter(function (listener) {
-    return listener !== removeListener;
-  }));
-};
-domAccess && addListener(window, Constants.RESIZE_EVENT, jsutils.debounce(update, DEBOUNCE_RATE));
-var setRNDimensions = function setRNDimensions() {};
-var Dimensions = {
-  get: get,
-  set: set,
-  update: update,
-  addEventListener: addEventListener,
-  removeEventListener: removeEventListener
-};
-
-var listeners$1 = {};
-var addThemeEvent = function addThemeEvent(event, listener) {
-  if (!event || !jsutils.isFunc(listener)) return;
-  listeners$1[event] = listeners$1[event] || [];
-  listeners$1[event].push(listener);
-  return listeners$1[event].length - 1;
-};
-var removeThemeEvent = function removeThemeEvent(event, removeListener) {
-  if (!event || !listeners$1[event] || !removeListener && removeListener !== 0) return;
-  jsutils.isNum(removeListener)
-  ? listeners$1[event].splice(removeListener, 1)
-  : jsutils.isFunc(removeListener) && jsutils.isArr(listeners$1[event]) && (listeners$1[event] = listeners$1[event].filter(function (listener) {
-    return listener !== removeListener;
-  }));
-};
-var fireThemeEvent = function fireThemeEvent(event) {
-  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    params[_key - 1] = arguments[_key];
-  }
-  jsutils.isArr(listeners$1[event]) && listeners$1[event].forEach(function (listener) {
-    return listener.apply(void 0, params);
-  });
-};
 
 var joinCache = {};
 addThemeEvent && addThemeEvent(Constants.BUILD_EVENT, function () {
@@ -363,58 +313,14 @@ var useDimensions = function useDimensions() {
   return dimensions;
 };
 
-var RePlatform = Constants.PLATFORM.WEB;
-var Platform = {
-  OS: 'web',
-  select: function select(obj) {
-    return jsutils.isObj(obj) && obj.web;
-  },
-  Version: 'ReTheme'
-};
-var setRNPlatform = function setRNPlatform() {};
+var RNPlatform;
 var getRNPlatform = function getRNPlatform() {
-  return Platform;
+  return RNPlatform;
 };
-
-var noUnitRules = {
-  animationIterationCount: true,
-  borderImageOutset: true,
-  borderImageSlice: true,
-  borderImageWidth: true,
-  boxFlex: true,
-  boxFlexGroup: true,
-  boxOrdinalGroup: true,
-  columnCount: true,
-  flex: true,
-  flexGrow: true,
-  flexPositive: true,
-  flexShrink: true,
-  flexNegative: true,
-  flexOrder: true,
-  gridRow: true,
-  gridColumn: true,
-  fontWeight: true,
-  lineClamp: true,
-  lineHeight: true,
-  opacity: true,
-  order: true,
-  orphans: true,
-  tabSize: true,
-  widows: true,
-  zIndex: true,
-  zoom: true,
-  fillOpacity: true,
-  floodOpacity: true,
-  stopOpacity: true,
-  strokeDasharray: true,
-  strokeDashoffset: true,
-  strokeMiterlimit: true,
-  strokeOpacity: true,
-  strokeWidth: true
+var setRNPlatform = function setRNPlatform(Plat) {
+  RNPlatform = Plat;
 };
-var checkValueUnits = function checkValueUnits(key, value) {
-  return noUnitRules[key] || !jsutils.isNum(value) ? value : "".concat(value, "px");
-};
+var RePlatform = Constants.PLATFORM.NATIVE;
 
 var getDefaultPlatforms = function getDefaultPlatforms() {
   var Platform = getRNPlatform();
@@ -453,21 +359,19 @@ var mergePlatformOS = function mergePlatformOS(theme, platforms) {
   return toMerge.length ? jsutils.deepMerge.apply(void 0, [{}].concat(_toConsumableArray(toMerge))) : theme;
 };
 var getPlatformTheme = function getPlatformTheme(theme, platforms) {
-  var Platform = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   if (!theme) return theme;
   return jsutils.reduceObj(theme, function (key, value, platformTheme) {
-    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms, Platform) : Platform && Platform.OS === 'web' ? checkValueUnits(key, value) : value;
+    platformTheme[key] = jsutils.isObj(value) ? getPlatformTheme(mergePlatformOS(value, platforms), platforms) : value;
     return platformTheme;
   }, theme);
 };
 var restructureTheme = function restructureTheme(theme) {
   var usrPlatform = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var Platform = getRNPlatform();
   return Object.keys(getSizeMap().hash).reduce(function (updatedTheme, size) {
     var builtSize = buildSizedThemes(theme, theme[size] || {}, size);
     if (!jsutils.isEmpty(builtSize)) updatedTheme[size] = builtSize;
     return updatedTheme;
-  }, getPlatformTheme(theme, buildPlatforms(usrPlatform), Platform));
+  }, getPlatformTheme(theme, buildPlatforms(usrPlatform)));
 };
 
 var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {
@@ -594,96 +498,15 @@ var useTheme = function useTheme() {
   return theme;
 };
 
-var updateListeners = function updateListeners(element, type, events, methods) {
-  if (!jsutils.isObj(element) || !jsutils.isFunc(element[type])) return null;
-  element[type](events.on, methods.on);
-  element[type](events.off, methods.off);
-};
-var createCBRef = function createCBRef(hookRef, events, methods, ref) {
-  return React.useCallback(function (element) {
-    hookRef.current && updateListeners(hookRef.current, Constants.REMOVE_EVENT, events, methods);
-    hookRef.current = element;
-    hookRef.current && updateListeners(hookRef.current, Constants.ADD_EVENT, events, methods);
-    !hookRef.current && methods.cleanup();
-  }, [methods.on, methods.off]);
-};
-var createMethods = function createMethods(offValue, onValue, setValue) {
-  var cbWatchers = [onValue, offValue];
-  return {
-    off: React.useCallback(function () {
-      return setValue(offValue);
-    }, cbWatchers),
-    on: React.useCallback(function () {
-      return setValue(onValue);
-    }, cbWatchers),
-    cleanup: function cleanup(methods) {
-      if (!methods) return;
-      jsutils.isFunc(methods.on) && methods.on(undefined);
-      jsutils.isFunc(methods.off) && methods.off(undefined);
-      onValue = undefined;
-      offValue = undefined;
-      setValue = undefined;
-      methods = undefined;
-    }
-  };
-};
-var getOptions = function getOptions() {
-  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  return options && !jsutils.isObj(options) ? {} : options;
-};
-var checkJoinValues = function checkJoinValues(offValue, onValue, valueOn, noMerge) {
-  return noMerge || !jsutils.isColl(onValue) || !jsutils.isColl(offValue) ? valueOn : jsutils.deepMerge(offValue, onValue);
-};
-var hookFactory = function hookFactory(events) {
-  return (
-    function (offValue, onValue) {
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-      var _getOptions = getOptions(options),
-          ref = _getOptions.ref,
-          noMerge = _getOptions.noMerge;
-      var hookRef = ref || React.useRef();
-      var _useState = React.useState(offValue),
-          _useState2 = _slicedToArray(_useState, 2),
-          value = _useState2[0],
-          setValue = _useState2[1];
-      var _useState3 = React.useState(checkJoinValues(offValue, onValue, onValue, noMerge)),
-          _useState4 = _slicedToArray(_useState3, 1),
-          activeValue = _useState4[0];
-      var elementRef = createCBRef(
-      hookRef,
-      events,
-      createMethods(offValue, activeValue, setValue));
-      if (jsutils.isFunc(ref)) {
-        var useValue = offValue === value ? value
-        : value === activeValue
-        ? checkJoinValues(offValue, onValue, activeValue, noMerge) : offValue;
-        var wrapRef = function wrapRef(element) {
-          ref(element);
-          elementRef(element);
-        };
-        return [wrapRef, useValue];
-      }
-      return [elementRef, value, setValue];
-    }
-  );
+var nativeThemeHook = function nativeThemeHook(offValue, onValue, options) {
+  var hookRef = jsutils.get(options, 'ref', React.useRef());
+  var _useState = React.useState(offValue),
+      _useState2 = _slicedToArray(_useState, 2),
+      value = _useState2[0],
+      setValue = _useState2[1];
+  return [hookRef, offValue, setValue];
 };
 
-var useThemeHover = hookFactory({
-  on: 'mouseenter',
-  off: 'mouseleave'
-});
-
-var useThemeActive = hookFactory({
-  on: 'mousedown',
-  off: 'mouseup'
-});
-
-var useThemeFocus = hookFactory({
-  on: 'focus',
-  off: 'blur'
-});
-
-exports.Dimensions = Dimensions;
 exports.ReThemeContext = ReThemeContext;
 exports.ReThemeProvider = ReThemeProvider;
 exports.addThemeEvent = addThemeEvent;
@@ -699,7 +522,7 @@ exports.setRNPlatform = setRNPlatform;
 exports.setSizes = setSizes;
 exports.useDimensions = useDimensions;
 exports.useTheme = useTheme;
-exports.useThemeActive = useThemeActive;
-exports.useThemeFocus = useThemeFocus;
-exports.useThemeHover = useThemeHover;
+exports.useThemeActive = nativeThemeHook;
+exports.useThemeFocus = nativeThemeHook;
+exports.useThemeHover = nativeThemeHook;
 exports.withTheme = withTheme;
