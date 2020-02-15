@@ -17,7 +17,6 @@
     "build:app": "cd app; yarn build",
     "clean:build": "rimraf build; mkdir build; mkdir build/cjs; mkdir build/esm; yarn copy:indexes",
     "copy:indexes": "cp ./index.cjs.js build/cjs/index.js; cp ./index.esm.js build/esm/index.js",
-    "predeploy": "yarn build:app",
     "deploy": "gh-pages -d docs",
     "dev": "yarn clean:build; rollup -c rollup.config.js -w",
     "app": "cd app; yarn start",
