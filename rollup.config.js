@@ -33,12 +33,12 @@ export default Array
     input: `./src/index.${platform}.js`,
     output: [
       {
-        file: `./build/cjs/index.cjs.${platform}.js`,
+        file: `./build/cjs/reTheme.${platform}.js`,
         format: 'cjs',
         sourcemaps: true
       },
       {
-        file: `./build/esm/index.esm.${platform}.js`,
+        file: `./build/esm/reTheme.${platform}.js`,
         format: 'esm',
         sourcemaps: true
       },
