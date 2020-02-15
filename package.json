@@ -5,7 +5,7 @@
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "repository": "https://github.com/lancetipton/ReTheme",
-  "homepage" : "https://simpleviewinc.github.io/sv-re-theme",
+  "homepage" : "https://simpleviewinc.github.io/re-theme",
   "author": "Lance Tipton",
   "license": "MIT",
   "files": [
@@ -17,7 +17,7 @@
     "build:app": "cd app; yarn build",
     "clean:build": "rimraf build; mkdir build; mkdir build/cjs; mkdir build/esm; yarn copy:indexes",
     "copy:indexes": "cp ./index.cjs.js build/cjs/index.js; cp ./index.esm.js build/esm/index.js",
-    "deploy": "gh-pages -d docs",
+    "deploy": "gh-pages -d docs -o upstream",
     "dev": "yarn clean:build; rollup -c rollup.config.js -w",
     "app": "cd app; yarn start",
     "start": "yarn dev",
@@ -49,8 +49,8 @@
     "rollup-plugin-terser": "5.1.2"
   },
   "peerDependencies": {
-    "jsutils": "git+https://github.com/lancetipton/jsutils.git#v3.2.1",
-    "react": "16.9.0"
+    "jsutils": "^git+https://github.com/lancetipton/jsutils.git#v3.2.1",
+    "react": "^16.9.0"
   },
   "jest": {
     "preset": "rollup-jest",
