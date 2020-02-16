@@ -178,6 +178,30 @@ var fireThemeEvent = function fireThemeEvent(event) {
   });
 };
 
+var getTheme = function getTheme() {
+  var _this = this;
+  for (var _len = arguments.length, sources = new Array(_len), _key = 0; _key < _len; _key++) {
+    sources[_key] = arguments[_key];
+  }
+  return jsutils.deepMerge.apply(void 0, _toConsumableArray(sources.reduce(function (toMerge, source) {
+    var styles = jsutils.isObj(source) ? source : jsutils.isStr(source) || jsutils.isArr(source) ? jsutils.get(_this, source) : null;
+    styles && toMerge.push(styles);
+    return toMerge;
+  }, [])));
+};
+
+var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
+  return jsutils.isObj(arg1) && jsutils.isObj(arg1.RTMeta);
+};
+var joinTheme = function joinTheme(arg1, arg2) {
+  for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    sources[_key - 2] = arguments[_key];
+  }
+  return hasManyFromTheme(arg1) ? getTheme.apply(void 0, _toConsumableArray(!jsutils.isArr(arg2) ? arg2 : arg2.map(function (arg) {
+    return jsutils.isObj(arg) && arg || arg && jsutils.get(arg1, arg);
+  })).concat(sources)) : getTheme.apply(void 0, [arg1, arg2].concat(sources));
+};
+
 var Constants = jsutils.deepFreeze({
   BUILD_EVENT: 'build',
   CHANGE_EVENT: 'change',
@@ -192,47 +216,6 @@ var Constants = jsutils.deepFreeze({
   },
   CSS_UNITS: ['%', 'cm', 'ch', 'em', 'rem', 'ex', 'in', 'mm', 'pc', 'pt', 'px', 'vw', 'vh', 'vmin', 'vmax']
 });
-
-var joinCache = {};
-addThemeEvent && addThemeEvent(Constants.BUILD_EVENT, function () {
-  return clearCache();
-});
-var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
-  return jsutils.isObj(arg1) && jsutils.isObj(arg1.RTMeta) && jsutils.isArr(arg2);
-};
-var clearCache = function clearCache(key) {
-  return key ? jsutils.unset(joinCache, [key]) : joinCache = {};
-};
-var buildCacheObj = function buildCacheObj(arg1, arg2, sources) {
-  return hasManyFromTheme(arg1, arg2) ? jsutils.deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
-    return jsutils.isObj(arg) && arg || arg && jsutils.get(arg1, arg);
-  })).concat(_toConsumableArray(sources))) : jsutils.deepMerge.apply(void 0, [arg1, arg2].concat(_toConsumableArray(sources)));
-};
-
-var join = function join(arg1, arg2) {
-  for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-    sources[_key - 2] = arguments[_key];
-  }
-  return buildCacheObj(arg1, arg2, sources);
-};
-
-var checkIdForStyle = function checkIdForStyle(theme, id) {
-  return jsutils.isStr(id) && jsutils.get(theme, id);
-};
-var getTheme = function getTheme(id) {
-  var _this = this;
-  var styleFromId = checkIdForStyle(this, id);
-  for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    sources[_key - 1] = arguments[_key];
-  }
-  var sourceStyles = !styleFromId ? sources : [styleFromId].concat(sources);
-  var styles = jsutils.deepMerge.apply(void 0, _toConsumableArray(sourceStyles.reduce(function (toMerge, source) {
-    var styles = jsutils.isObj(source) ? source : jsutils.isStr(source) ? jsutils.get(_this, source) : null;
-    styles && toMerge.push(styles);
-    return toMerge;
-  }, [])));
-  return styles;
-};
 
 var sizeMap = {
   entries: [['xsmall', 1], ['small', 320], ['medium', 768], ['large', 1024], ['xlarge', 1366]],
@@ -407,7 +390,7 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme, usrPlat
     width: width,
     height: height
   };
-  builtTheme.join = builtTheme.join || join;
+  builtTheme.join = builtTheme.join || joinTheme;
   builtTheme.get = builtTheme.get || getTheme.bind(builtTheme);
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme);
   return builtTheme;

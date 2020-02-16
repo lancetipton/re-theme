@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { isFunc, isNum, isArr, deepFreeze, unset, isObj, deepMerge, get, isStr, logData, mapObj, softFalsy, toNum, reduceObj, isEmpty } from 'jsutils';
+import { isFunc, isNum, isArr, deepMerge, isObj, isStr, get, deepFreeze, logData, mapObj, softFalsy, toNum, reduceObj, unset, isEmpty } from 'jsutils';
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -171,6 +171,30 @@ var fireThemeEvent = function fireThemeEvent(event) {
   });
 };
 
+var getTheme = function getTheme() {
+  var _this = this;
+  for (var _len = arguments.length, sources = new Array(_len), _key = 0; _key < _len; _key++) {
+    sources[_key] = arguments[_key];
+  }
+  return deepMerge.apply(void 0, _toConsumableArray(sources.reduce(function (toMerge, source) {
+    var styles = isObj(source) ? source : isStr(source) || isArr(source) ? get(_this, source) : null;
+    styles && toMerge.push(styles);
+    return toMerge;
+  }, [])));
+};
+
+var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
+  return isObj(arg1) && isObj(arg1.RTMeta);
+};
+var joinTheme = function joinTheme(arg1, arg2) {
+  for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    sources[_key - 2] = arguments[_key];
+  }
+  return hasManyFromTheme(arg1) ? getTheme.apply(void 0, _toConsumableArray(!isArr(arg2) ? arg2 : arg2.map(function (arg) {
+    return isObj(arg) && arg || arg && get(arg1, arg);
+  })).concat(sources)) : getTheme.apply(void 0, [arg1, arg2].concat(sources));
+};
+
 var Constants = deepFreeze({
   BUILD_EVENT: 'build',
   CHANGE_EVENT: 'change',
@@ -185,47 +209,6 @@ var Constants = deepFreeze({
   },
   CSS_UNITS: ['%', 'cm', 'ch', 'em', 'rem', 'ex', 'in', 'mm', 'pc', 'pt', 'px', 'vw', 'vh', 'vmin', 'vmax']
 });
-
-var joinCache = {};
-addThemeEvent && addThemeEvent(Constants.BUILD_EVENT, function () {
-  return clearCache();
-});
-var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
-  return isObj(arg1) && isObj(arg1.RTMeta) && isArr(arg2);
-};
-var clearCache = function clearCache(key) {
-  return key ? unset(joinCache, [key]) : joinCache = {};
-};
-var buildCacheObj = function buildCacheObj(arg1, arg2, sources) {
-  return hasManyFromTheme(arg1, arg2) ? deepMerge.apply(void 0, _toConsumableArray(arg2.map(function (arg) {
-    return isObj(arg) && arg || arg && get(arg1, arg);
-  })).concat(_toConsumableArray(sources))) : deepMerge.apply(void 0, [arg1, arg2].concat(_toConsumableArray(sources)));
-};
-
-var join = function join(arg1, arg2) {
-  for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-    sources[_key - 2] = arguments[_key];
-  }
-  return buildCacheObj(arg1, arg2, sources);
-};
-
-var checkIdForStyle = function checkIdForStyle(theme, id) {
-  return isStr(id) && get(theme, id);
-};
-var getTheme = function getTheme(id) {
-  var _this = this;
-  var styleFromId = checkIdForStyle(this, id);
-  for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    sources[_key - 1] = arguments[_key];
-  }
-  var sourceStyles = !styleFromId ? sources : [styleFromId].concat(sources);
-  var styles = deepMerge.apply(void 0, _toConsumableArray(sourceStyles.reduce(function (toMerge, source) {
-    var styles = isObj(source) ? source : isStr(source) ? get(_this, source) : null;
-    styles && toMerge.push(styles);
-    return toMerge;
-  }, [])));
-  return styles;
-};
 
 var sizeMap = {
   entries: [['xsmall', 1], ['small', 320], ['medium', 768], ['large', 1024], ['xlarge', 1366]],
@@ -400,7 +383,7 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme, usrPlat
     width: width,
     height: height
   };
-  builtTheme.join = builtTheme.join || join;
+  builtTheme.join = builtTheme.join || joinTheme;
   builtTheme.get = builtTheme.get || getTheme.bind(builtTheme);
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme);
   return builtTheme;
