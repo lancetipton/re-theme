@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
-import { isFunc, isNum, isArr, deepMerge, isObj, isStr, get, deepFreeze, logData, mapObj, softFalsy, toNum, reduceObj, unset, isEmpty } from 'jsutils';
+import React, { useState, useEffect, useContext, useRef, useLayoutEffect } from 'react';
+import { isFunc, isNum, isArr, deepMerge, isObj, isStr, get, deepFreeze, logData, mapObj, softFalsy, toNum, reduceObj, unset, isEmpty, jsonEqual } from 'jsutils';
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -536,12 +536,18 @@ var useTheme = function useTheme() {
   return theme;
 };
 
+var checkEqual = function checkEqual(obj1, obj2) {
+  return obj1 === obj2 || jsonEqual(obj1, obj2);
+};
 var nativeThemeHook = function nativeThemeHook(offValue, onValue, options) {
   var hookRef = get(options, 'ref', useRef());
   var _useState = useState(offValue),
       _useState2 = _slicedToArray(_useState, 2),
       value = _useState2[0],
       setValue = _useState2[1];
+  useLayoutEffect(function () {
+    !checkEqual(offValue, value) && setValue(value);
+  }, [offValue, onValue]);
   return [hookRef, offValue, setValue];
 };
 

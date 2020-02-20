@@ -543,12 +543,18 @@ var useTheme = function useTheme() {
   return theme;
 };
 
+var checkEqual = function checkEqual(obj1, obj2) {
+  return obj1 === obj2 || jsutils.jsonEqual(obj1, obj2);
+};
 var nativeThemeHook = function nativeThemeHook(offValue, onValue, options) {
   var hookRef = jsutils.get(options, 'ref', React.useRef());
   var _useState = React.useState(offValue),
       _useState2 = _slicedToArray(_useState, 2),
       value = _useState2[0],
       setValue = _useState2[1];
+  React.useLayoutEffect(function () {
+    !checkEqual(offValue, value) && setValue(value);
+  }, [offValue, onValue]);
   return [hookRef, offValue, setValue];
 };
 
