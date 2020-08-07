@@ -1,4 +1,6 @@
 export * from './useTheme'
+export * from './useStyles'
+
 import { nativeThemeHook } from './nativeThemeHook'
 
 export {

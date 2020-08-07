@@ -1,4 +1,5 @@
 export * from './useTheme'
+export * from './useStyles'
 export * from './useThemeHover'
 export * from './useThemeActive'
 export * from './useThemeFocus'

@@ -19,7 +19,13 @@ import {
   withTheme,
 } from './theme'
 
-import { useTheme, useThemeActive, useThemeFocus, useThemeHover } from 'ReHooks'
+import {
+  useStyles,
+  useTheme,
+  useThemeActive,
+  useThemeFocus,
+  useThemeHover
+} from 'ReHooks'
 
 export {
   // Dimensions exports
@@ -38,6 +44,7 @@ export {
   setDefaultTheme,
   withTheme,
   // Theme hooks
+  useStyles,
   useTheme,
   useThemeActive,
   useThemeFocus,
