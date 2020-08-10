@@ -27,6 +27,12 @@ let currentTheme = {}
 const updateCurrentTheme = updatedTheme => (currentTheme = updatedTheme)
 
 /**
+ * Helper to allow other methods to get the current theme used by the provider
+ * @returns {Object} currentTheme - Current theme used by the provider
+ */
+export const getCurrentTheme = () => currentTheme
+
+/**
  * Context Provider used to set the theme.
  * <br/> All children that use the withTheme function will have access to the passed in theme prop
  * @param {Object} props - Theme provider props

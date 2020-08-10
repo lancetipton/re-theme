@@ -11,7 +11,7 @@ import { getTheme } from '../helpers/getTheme'
  */
 export const useTheme = () => {
   const theme = useContext(ReThemeContext)
-  theme.get = getTheme.bind(theme)
+  theme.get = getTheme
 
   return theme
 }
