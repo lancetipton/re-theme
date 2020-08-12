@@ -24,7 +24,7 @@
     "copy:docs": "node scripts/copyDocs.js",
     "copy:build": "node scripts/copyBuild.js",
     "eject": "react-scripts eject",
-    "start": "yarn copy:build; yarn copy:readme; react-scripts start; yarn",
+    "start": "yarn copy:build; yarn copy:readme; PORT=${DOC_APP_PORT:-5000} react-scripts start",
     "test": "yarn copy:build; react-scripts test"
   },
   "browserslist": {
