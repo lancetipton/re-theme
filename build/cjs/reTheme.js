@@ -1,14 +1,137 @@
 'use strict';
 
-console.log(`---------- cjs ----------`)
-
 Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var jsutils = require('@ltipton/jsutils');
 var React = require('react');
 var React__default = _interopDefault(React);
-var jsutils = require('jsutils');
+
+var Constants = jsutils.deepFreeze({
+  BUILD_EVENT: 'build',
+  CHANGE_EVENT: 'change',
+  RESIZE_EVENT: 'resize',
+  ADD_EVENT: 'addEventListener',
+  REMOVE_EVENT: 'removeEventListener',
+  NO_CACHE: '__$$RE_NO_CACHE__',
+  PLATFORM: {
+    NATIVE: '$native',
+    WEB: '$web',
+    ALL: '$all'
+  },
+  CSS_UNITS: ['%', 'cm', 'ch', 'em', 'rem', 'ex', 'in', 'mm', 'pc', 'pt', 'px', 'vw', 'vh', 'vmin', 'vmax']
+});
+
+var RNDimensions;
+var setRNDimensions = function setRNDimensions(dims) {
+  RNDimensions = dims;
+};
+var Dimensions = {
+  get: function get() {
+    var _RNDimensions;
+    return RNDimensions ? (_RNDimensions = RNDimensions).get.apply(_RNDimensions, arguments) : {
+      width: 0,
+      height: 0
+    };
+  },
+  set: function set() {
+    var _RNDimensions2;
+    RNDimensions && (_RNDimensions2 = RNDimensions).set.apply(_RNDimensions2, arguments);
+  },
+  update: function update() {
+    var _RNDimensions3;
+    RNDimensions && (_RNDimensions3 = RNDimensions).update.apply(_RNDimensions3, arguments);
+  },
+  addEventListener: function addEventListener() {
+    var _RNDimensions4;
+    RNDimensions && (_RNDimensions4 = RNDimensions).addEventListener.apply(_RNDimensions4, arguments);
+  },
+  removeEventListener: function removeEventListener() {
+    var _RNDimensions5;
+    RNDimensions && (_RNDimensions5 = RNDimensions).removeEventListener.apply(_RNDimensions5, arguments);
+  }
+};
+
+var DEBOUNCE_RATE = 100;
+var hasDomAccess = function hasDomAccess() {
+  return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
+};
+var domAccess = hasDomAccess();
+var getWindow = function getWindow() {
+  var winAccess = !hasDomAccess();
+  return winAccess ? {
+    devicePixelRatio: undefined,
+    innerHeight: undefined,
+    innerWidth: undefined,
+    screen: {
+      height: undefined,
+      width: undefined
+    }
+  } : function () {
+    return window;
+  }();
+};
+var winDim = getWindow();
+var addListener = function addListener(element, event, method, options) {
+  element && jsutils.checkCall(element.addEventListener, event, method, options || false);
+};
+var setScreen = function setScreen(win) {
+  return {
+    fontScale: 1,
+    height: win.screen.height,
+    scale: win.devicePixelRatio || 1,
+    width: win.screen.width
+  };
+};
+var setWin = function setWin(win) {
+  return {
+    fontScale: 1,
+    height: win.innerHeight,
+    scale: win.devicePixelRatio || 1,
+    width: win.innerWidth
+  };
+};
+var dimensions = {
+  window: setWin(winDim),
+  screen: setScreen(winDim)
+};
+var listeners = {};
+var get = function get(key) {
+  return dimensions[key];
+};
+var set = function set(_ref) {
+  var screen = _ref.screen,
+      win = _ref.window;
+  screen && (dimensions.screen = screen);
+  win && (dimensions.window = win);
+};
+var update = function update() {
+  dimensions.window = setWin(winDim);
+  dimensions.screen = setScreen(winDim);
+  jsutils.isArr(listeners[Constants.CHANGE_EVENT]) && listeners[Constants.CHANGE_EVENT].forEach(function (listener) {
+    return listener(dimensions);
+  });
+};
+var addEventListener = function addEventListener(type, listener) {
+  if (!type || !jsutils.isFunc(listener)) return;
+  listeners[type] = listeners[type] || [];
+  listeners[type].push(listener);
+};
+var removeEventListener = function removeEventListener(type, removeListener) {
+  type && jsutils.isFunc(removeListener) && jsutils.isArr(listeners[type]) && (listeners[type] = listeners[type].filter(function (listener) {
+    return listener !== removeListener;
+  }));
+};
+domAccess && addListener(window, Constants.RESIZE_EVENT, jsutils.debounce(update, DEBOUNCE_RATE));
+var Dimensions$1 = {
+  get: get,
+  set: set,
+  update: update,
+  addEventListener: addEventListener,
+  removeEventListener: removeEventListener
+};
+setRNDimensions(Dimensions$1);
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -136,101 +259,6 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-var Constants = jsutils.deepFreeze({
-  BUILD_EVENT: 'build',
-  CHANGE_EVENT: 'change',
-  RESIZE_EVENT: 'resize',
-  ADD_EVENT: 'addEventListener',
-  REMOVE_EVENT: 'removeEventListener',
-  NO_CACHE: '__$$RE_NO_CACHE__',
-  PLATFORM: {
-    NATIVE: '$native',
-    WEB: '$web',
-    ALL: '$all'
-  },
-  CSS_UNITS: ['%', 'cm', 'ch', 'em', 'rem', 'ex', 'in', 'mm', 'pc', 'pt', 'px', 'vw', 'vh', 'vmin', 'vmax']
-});
-
-var DEBOUNCE_RATE = 100;
-var hasDomAccess = function hasDomAccess() {
-  return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
-};
-var domAccess = hasDomAccess();
-var getWindow = function getWindow() {
-  var winAccess = !hasDomAccess();
-  return winAccess ? {
-    devicePixelRatio: undefined,
-    innerHeight: undefined,
-    innerWidth: undefined,
-    screen: {
-      height: undefined,
-      width: undefined
-    }
-  } : function () {
-    return window;
-  }();
-};
-var winDim = getWindow();
-var addListener = function addListener(element, event, method, options) {
-  element && jsutils.checkCall(element.addEventListener, event, method, options || false);
-};
-var setScreen = function setScreen(win) {
-  return {
-    fontScale: 1,
-    height: win.screen.height,
-    scale: win.devicePixelRatio || 1,
-    width: win.screen.width
-  };
-};
-var setWin = function setWin(win) {
-  return {
-    fontScale: 1,
-    height: win.innerHeight,
-    scale: win.devicePixelRatio || 1,
-    width: win.innerWidth
-  };
-};
-var dimensions = {
-  window: setWin(winDim),
-  screen: setScreen(winDim)
-};
-var listeners = {};
-var get = function get(key) {
-  return dimensions[key];
-};
-var set = function set(_ref) {
-  var screen = _ref.screen,
-      win = _ref.window;
-  screen && (dimensions.screen = screen);
-  win && (dimensions.window = win);
-};
-var update = function update() {
-  dimensions.window = setWin(winDim);
-  dimensions.screen = setScreen(winDim);
-  jsutils.isArr(listeners[Constants.CHANGE_EVENT]) && listeners[Constants.CHANGE_EVENT].forEach(function (listener) {
-    return listener(dimensions);
-  });
-};
-var addEventListener = function addEventListener(type, listener) {
-  if (!type || !jsutils.isFunc(listener)) return;
-  listeners[type] = listeners[type] || [];
-  listeners[type].push(listener);
-};
-var removeEventListener = function removeEventListener(type, removeListener) {
-  type && jsutils.isFunc(removeListener) && jsutils.isArr(listeners[type]) && (listeners[type] = listeners[type].filter(function (listener) {
-    return listener !== removeListener;
-  }));
-};
-domAccess && addListener(window, Constants.RESIZE_EVENT, jsutils.debounce(update, DEBOUNCE_RATE));
-var setRNDimensions = function setRNDimensions() {};
-var Dimensions = {
-  get: get,
-  set: set,
-  update: update,
-  addEventListener: addEventListener,
-  removeEventListener: removeEventListener
-};
-
 var listeners$1 = {};
 var addThemeEvent = function addThemeEvent(event, listener) {
   if (!event || !jsutils.isFunc(listener)) return;
@@ -253,99 +281,6 @@ var fireThemeEvent = function fireThemeEvent(event) {
   jsutils.isArr(listeners$1[event]) && listeners$1[event].forEach(function (listener) {
     return listener.apply(void 0, params);
   });
-};
-
-var getTheme = function getTheme() {
-  var _this = this;
-  for (var _len = arguments.length, sources = new Array(_len), _key = 0; _key < _len; _key++) {
-    sources[_key] = arguments[_key];
-  }
-  return jsutils.deepMerge.apply(void 0, _toConsumableArray(sources.reduce(function (toMerge, source) {
-    var styles = jsutils.isObj(source) ? source : jsutils.isStr(source) || jsutils.isArr(source) ? jsutils.get(_this, source) : null;
-    styles && toMerge.push(styles);
-    return toMerge;
-  }, [])));
-};
-
-var hasManyFromTheme = function hasManyFromTheme(arg1, arg2) {
-  return jsutils.isObj(arg1) && jsutils.isObj(arg1.RTMeta);
-};
-var joinTheme = function joinTheme(arg1, arg2) {
-  for (var _len = arguments.length, sources = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-    sources[_key - 2] = arguments[_key];
-  }
-  return hasManyFromTheme(arg1) ? getTheme.apply(void 0, _toConsumableArray(!jsutils.isArr(arg2) ? arg2 : arg2.map(function (arg) {
-    return jsutils.isObj(arg) && arg || arg && jsutils.get(arg1, arg);
-  })).concat(sources)) : getTheme.apply(void 0, [arg1, arg2].concat(sources));
-};
-
-var convertToPercent = function convertToPercent(num, percent) {
-  return parseInt(num * (100 + percent) / 100);
-};
-var checkColorMax = function checkColorMax(num) {
-  return num < 255 ? num : 255;
-};
-var convertToColor = function convertToColor(num, percent) {
-  var asPercent = convertToPercent(num, percent);
-  var withMax = checkColorMax(asPercent);
-  var asStr = withMax.toString(16);
-  return asStr.length == 1 ? "0".concat(asStr) : asStr;
-};
-var mapOpacity = function mapOpacity(opacity) {
-  for (var amount = 100; amount >= 0; amount -= 5) {
-    opacity["_".concat(amount)] = opacity((amount / 100).toFixed(2));
-  }
-  return opacity;
-};
-var hexToRgba = function hexToRgba(hex, opacity, asObj) {
-  if (!hex) return console.warn('Can not convert hex to rgba', hex) || "rgba(255,255,255,0)";
-  hex = hex.indexOf('#') === 0 ? hex.replace('#', '') : hex;
-  opacity = opacity > 1 ? (opacity / 100).toFixed(4) : opacity;
-  var rgbaObj = {
-    r: parseInt(hex.substring(0, 2), 16),
-    g: parseInt(hex.substring(2, 4), 16),
-    b: parseInt(hex.substring(4, 6), 16),
-    a: !opacity && opacity !== 0 ? 1 : opacity
-  };
-  return asObj ? rgbaObj : toRgb(rgbaObj);
-};
-var opacity = mapOpacity(function (amount, color) {
-  return jsutils.isStr(color) && color.indexOf('#') === 0 ? hexToRgba(color, amount) : jsutils.isObj(color) ? toRgb(color, amount) : "rgba(".concat(color || '0,0,0', ", ").concat(amount, ")");
-});
-var shadeHex = function shadeHex(color, percent) {
-  var rgba = hexToRgba(color, 1, true);
-  return '#' + convertToColor(rgba.r, percent) + convertToColor(rgba.g, percent) + convertToColor(rgba.b, percent);
-};
-var toRgb = function toRgb(red, green, blue, alpha) {
-  var obj = jsutils.isObj(red) ? red : {
-    r: red,
-    g: green,
-    b: blue,
-    a: alpha
-  };
-  obj.a = !obj.a && obj.a !== 0 ? 1 : obj.a;
-  return "rgba(".concat(obj.r, ", ").concat(obj.g, ", ").concat(obj.b, ", ").concat(obj.a, ")");
-};
-var transition = function transition() {
-  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-  var speed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 250;
-  var timingFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'ease';
-  return typeof props === 'string' ? "".concat(props, " ").concat(speed, "ms ").concat(timingFunc) : jsutils.isArr(props) ? props.reduce(function (trans, prop) {
-    trans.push("".concat(prop, " ").concat(speed, "ms ").concat(timingFunc));
-    return trans;
-  }, []).join(', ') : null;
-};
-
-var colors = /*#__PURE__*/Object.freeze({
-  hexToRgba: hexToRgba,
-  opacity: opacity,
-  shadeHex: shadeHex,
-  toRgb: toRgb,
-  transition: transition
-});
-
-var helpers = {
-  colors: colors
 };
 
 var sizeMap = {
@@ -427,25 +362,26 @@ var useDimensions = function useDimensions() {
   return dimensions;
 };
 
-var RePlatform = Constants.PLATFORM.WEB;
-var Platform = {
+var webDefPlatform = {
   OS: 'web',
   select: function select(obj) {
     return jsutils.isObj(obj) && obj.web;
   },
   Version: 'ReTheme'
 };
-var setRNPlatform = function setRNPlatform() {};
+var RNPlatform;
 var getRNPlatform = function getRNPlatform() {
-  return Platform;
+  return RNPlatform || webDefPlatform;
+};
+var setRNPlatform = function setRNPlatform(Plat) {
+  RNPlatform = Plat;
 };
 
 var getDefaultPlatforms = function getDefaultPlatforms() {
   var Platform = getRNPlatform();
-  return [
-  '$' + jsutils.get(Platform, 'OS'),
-  RePlatform,
-  Constants.PLATFORM.ALL];
+  var stylePlatforms = ['$' + jsutils.get(Platform, 'OS')];
+  if (jsutils.get(Platform, 'OS') !== 'web') stylePlatforms.push('$native');
+  return stylePlatforms.concat(Constants.PLATFORM.ALL);
 };
 var buildPlatforms = function buildPlatforms(usrPlatforms) {
   var platsToUse = Object.keys(usrPlatforms).filter(function (key) {
@@ -492,6 +428,13 @@ var restructureTheme = function restructureTheme(theme) {
   }, getPlatformTheme(theme, buildPlatforms(usrPlatform)));
 };
 
+var currentTheme = {};
+var getCurrentTheme = function getCurrentTheme() {
+  return currentTheme;
+};
+var updateCurrentTheme = function updateCurrentTheme(updatedTheme) {
+  return currentTheme = updatedTheme;
+};
 var joinThemeSizes = function joinThemeSizes(theme, sizeKey) {
   var extraTheme = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   var sizesToMerge = getMergeSizes(sizeKey);
@@ -526,8 +469,7 @@ var buildTheme = function buildTheme(theme, width, height, defaultTheme, usrPlat
     width: width,
     height: height
   };
-  builtTheme.join = builtTheme.join || joinTheme;
-  builtTheme.get = builtTheme.get || getTheme.bind(builtTheme);
+  updateCurrentTheme(builtTheme);
   fireThemeEvent(Constants.BUILD_EVENT, builtTheme);
   return builtTheme;
 };
@@ -557,10 +499,6 @@ var withTheme = function withTheme(Component) {
   };
 };
 
-var currentTheme = {};
-var updateCurrentTheme = function updateCurrentTheme(updatedTheme) {
-  return currentTheme = updatedTheme;
-};
 var ReThemeProvider = function ReThemeProvider(props) {
   var children = props.children,
       theme = props.theme,
@@ -581,6 +519,7 @@ var ReThemeProvider = function ReThemeProvider(props) {
     var changeToSize = getSize(width);
     if (!changeToSize) return;
     var sizeToBe = changeToSize[0];
+    var currentTheme = getCurrentTheme();
     var currentSize = jsutils.get(currentTheme, ['RTMeta', 'key']);
     sizeToBe !== currentSize && setDimensions({
       width: width,
@@ -591,11 +530,8 @@ var ReThemeProvider = function ReThemeProvider(props) {
   };
   React.useEffect(function () {
     Dimensions.addEventListener('change', onChange);
-    addThemeEvent(Constants.BUILD_EVENT, updateCurrentTheme);
     return function () {
       Dimensions.removeEventListener('change', onChange);
-      removeThemeEvent(Constants.BUILD_EVENT, updateCurrentTheme);
-      currentTheme = {};
     };
   }, []);
   logRenders && console.log("---------- RE-THEME RE-RENDER ----------");
@@ -604,10 +540,85 @@ var ReThemeProvider = function ReThemeProvider(props) {
   }, children);
 };
 
+var convertToPercent = function convertToPercent(num, percent) {
+  return parseInt(num * (100 + percent) / 100);
+};
+var checkColorMax = function checkColorMax(num) {
+  return num < 255 ? num : 255;
+};
+var convertToColor = function convertToColor(num, percent) {
+  var asPercent = convertToPercent(num, percent);
+  var withMax = checkColorMax(asPercent);
+  var asStr = withMax.toString(16);
+  return asStr.length == 1 ? "0".concat(asStr) : asStr;
+};
+var mapOpacity = function mapOpacity(opacity) {
+  for (var amount = 100; amount >= 0; amount -= 5) {
+    opacity["_".concat(amount)] = opacity((amount / 100).toFixed(2));
+  }
+  return opacity;
+};
+var hexToRgba = function hexToRgba(hex, opacity, asObj) {
+  if (!hex) return console.warn('Can not convert hex to rgba', hex) || "rgba(255,255,255,0)";
+  hex = hex.indexOf('#') === 0 ? hex.replace('#', '') : hex;
+  opacity = opacity > 1 ? (opacity / 100).toFixed(4) : opacity;
+  var rgbaObj = {
+    r: parseInt(hex.substring(0, 2), 16),
+    g: parseInt(hex.substring(2, 4), 16),
+    b: parseInt(hex.substring(4, 6), 16),
+    a: !opacity && opacity !== 0 ? 1 : opacity
+  };
+  return asObj ? rgbaObj : toRgb(rgbaObj);
+};
+var opacity = mapOpacity(function (amount, color) {
+  return jsutils.isStr(color) && color.indexOf('#') === 0 ? hexToRgba(color, amount) : jsutils.isObj(color) ? toRgb(color, amount) : "rgba(".concat(color || '0,0,0', ", ").concat(amount, ")");
+});
+var shadeHex = function shadeHex(color, percent) {
+  var rgba = hexToRgba(color, 1, true);
+  return '#' + convertToColor(rgba.r, percent) + convertToColor(rgba.g, percent) + convertToColor(rgba.b, percent);
+};
+var toRgb = function toRgb(red, green, blue, alpha) {
+  var obj = jsutils.isObj(red) ? red : {
+    r: red,
+    g: green,
+    b: blue,
+    a: alpha
+  };
+  obj.a = !obj.a && obj.a !== 0 ? 1 : obj.a;
+  return "rgba(".concat(obj.r, ", ").concat(obj.g, ", ").concat(obj.b, ", ").concat(obj.a, ")");
+};
+var transition = function transition() {
+  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var speed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 250;
+  var timingFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'ease';
+  return typeof props === 'string' ? "".concat(props, " ").concat(speed, "ms ").concat(timingFunc) : jsutils.isArr(props) ? props.reduce(function (trans, prop) {
+    trans.push("".concat(prop, " ").concat(speed, "ms ").concat(timingFunc));
+    return trans;
+  }, []).join(', ') : null;
+};
+
+var colors = /*#__PURE__*/Object.freeze({
+  hexToRgba: hexToRgba,
+  opacity: opacity,
+  shadeHex: shadeHex,
+  toRgb: toRgb,
+  transition: transition
+});
+
+var helpers = {
+  colors: colors
+};
+
 var useTheme = function useTheme() {
-  var theme = React.useContext(ReThemeContext);
-  theme.get = getTheme.bind(theme);
-  return theme;
+  return React.useContext(ReThemeContext);
+};
+
+var useStyles = function useStyles(stylesCb, customStyles) {
+  var styles = !customStyles || !jsutils.isObj(customStyles) || jsutils.isEmptyColl(customStyles) ? false : customStyles;
+  var theme = useTheme();
+  return React.useMemo(function () {
+    return jsutils.checkCall(stylesCb, theme, styles);
+  }, [theme, stylesCb, styles]);
 };
 
 var updateListeners = function updateListeners(element, type, events, methods) {
@@ -669,13 +680,12 @@ var hookFactory = function hookFactory(events) {
       hookRef,
       events,
       createMethods(offValue, activeValue, setValue));
-      var useValue = value === offValue
-      ? value
-      : value === activeValue
-      ? activeValue
-      : offValue;
-      return !jsutils.isFunc(ref)
-      ? [elementRef, useValue, setValue] : jsutils.checkCall(function () {
+      var useValue = value === offValue ?
+      value :
+      value === activeValue ?
+      activeValue : offValue;
+      return !jsutils.isFunc(ref) ?
+      [elementRef, useValue, setValue] : jsutils.checkCall(function () {
         var wrapRef = function wrapRef(element) {
           ref(element);
           elementRef(element);
@@ -716,6 +726,7 @@ exports.setRNDimensions = setRNDimensions;
 exports.setRNPlatform = setRNPlatform;
 exports.setSizes = setSizes;
 exports.useDimensions = useDimensions;
+exports.useStyles = useStyles;
 exports.useTheme = useTheme;
 exports.useThemeActive = useThemeActive;
 exports.useThemeFocus = useThemeFocus;
