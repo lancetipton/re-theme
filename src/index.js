@@ -1,4 +1,7 @@
+import { setRNDimensions } from './dimensions/webDimensions'
 import { ReThemeContext, ReThemeProvider } from './context'
+import { setRNPlatform } from './context/platform'
+import { helpers } from './helpers'
 import {
   getSize,
   getSizeMap,
@@ -6,9 +9,6 @@ import {
   setSizes,
   useDimensions,
 } from './dimensions'
-import { setRNDimensions } from 'ReDimensions'
-import { setRNPlatform } from 'RePlatform'
-import { helpers } from './helpers'
 
 import {
   addThemeEvent,
@@ -24,7 +24,7 @@ import {
   useTheme,
   useThemeActive,
   useThemeFocus,
-  useThemeHover
+  useThemeHover,
 } from 'ReHooks'
 
 export {

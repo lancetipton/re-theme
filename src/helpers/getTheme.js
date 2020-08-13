@@ -1,5 +1,5 @@
-import { deepMerge, get, isArr, isObj, isStr } from 'jsutils'
-import { getCurrentTheme } from '../context/provider'
+import { deepMerge, get, isArr, isObj, isStr } from '@ltipton/jsutils'
+import { getCurrentTheme } from '../theme/buildTheme'
 
 /**
  * Merges the styles from the passed in sources
@@ -11,7 +11,7 @@ import { getCurrentTheme } from '../context/provider'
  */
 export const getTheme = function (...sources) {
   const theme = getCurrentTheme()
-  
+
   // Build the styles by merging the sources together
   // Check if each source is an id to cache or get the styles from the theme
   return deepMerge(

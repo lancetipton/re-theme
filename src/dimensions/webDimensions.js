@@ -1,7 +1,8 @@
 /** @module dimensions */
 
-import { debounce, isArr, isFunc, checkCall } from 'jsutils'
+import { debounce, isArr, isFunc, checkCall } from '@ltipton/jsutils'
 import { Constants } from '../constants'
+import { setRNDimensions } from './dimensions'
 
 const DEBOUNCE_RATE = 100
 
@@ -157,12 +158,14 @@ const removeEventListener = (type, removeListener) => {
 domAccess &&
   addListener(window, Constants.RESIZE_EVENT, debounce(update, DEBOUNCE_RATE))
 
-export const setRNDimensions = () => {}
-
-export const Dimensions = {
+const Dimensions = {
   get,
   set,
   update,
   addEventListener,
   removeEventListener,
 }
+
+setRNDimensions(Dimensions)
+
+export { Dimensions, setRNDimensions }

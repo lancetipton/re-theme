@@ -3,22 +3,28 @@
 
 import { getSizeMap } from '../dimensions'
 import { Constants } from '../constants'
-import { RePlatform, getRNPlatform } from 'RePlatform'
-import { isObj, deepMerge, reduceObj, isEmpty, unset, get } from 'jsutils'
+import { getRNPlatform } from '../context/platform'
+import {
+  isObj,
+  deepMerge,
+  reduceObj,
+  isEmpty,
+  unset,
+  get,
+} from '@ltipton/jsutils'
 
 // Default platforms to use when restructuring the theme
 // Use array, so we don't lose the order
 const getDefaultPlatforms = () => {
   const Platform = getRNPlatform()
+  // Rules for the OS platform ( web || ios || android )
+  const stylePlatforms = ['$' + get(Platform, 'OS')]
 
-  return [
-    // Rules for the OS platform ( web || ios || android )
-    '$' + get(Platform, 'OS'),
-    // Rules for the RePlatform ( web || native )
-    RePlatform,
-    // Rules for all platforms and os's
-    Constants.PLATFORM.ALL,
-  ]
+  // If it's not a web platform, then add the $native platform
+  if (get(Platform, 'OS') !== 'web') stylePlatforms.push('$native')
+
+  // Rules for all platforms and os's
+  return stylePlatforms.concat(Constants.PLATFORM.ALL)
 }
 
 /**

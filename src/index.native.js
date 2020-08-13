@@ -1,4 +1,5 @@
 import { ReThemeContext, ReThemeProvider } from './context'
+import { setRNPlatform } from './context/platform'
 import {
   getSize,
   getSizeMap,
@@ -6,8 +7,7 @@ import {
   setSizes,
   useDimensions,
 } from './dimensions'
-import { setRNDimensions } from 'ReDimensions'
-import { setRNPlatform } from 'RePlatform'
+import { setRNDimensions } from './dimensions/dimensions'
 import { helpers } from './helpers'
 
 import {

@@ -3,34 +3,10 @@
 
 import React, { useEffect, useState } from 'react'
 import { ReThemeContext } from './context'
-import { Dimensions } from 'ReDimensions'
+import { Dimensions } from '../dimensions/dimensions'
 import { getSize } from '../dimensions/sizeMap'
-import {
-  buildTheme,
-  getDefaultTheme,
-  addThemeEvent,
-  removeThemeEvent,
-} from '../theme'
-import { Constants } from '../constants'
-import { get } from 'jsutils'
-
-/**
- * Holds the current theme after it's built
- */
-let currentTheme = {}
-
-/**
- * Helper to update the current Theme when ever the theme is built
- * Gets added as an event listener, and is called every time the theme is re-built
- * @param {Object} updatedTheme - Update built theme
- */
-const updateCurrentTheme = updatedTheme => (currentTheme = updatedTheme)
-
-/**
- * Helper to allow other methods to get the current theme used by the provider
- * @returns {Object} currentTheme - Current theme used by the provider
- */
-export const getCurrentTheme = () => currentTheme
+import { buildTheme, getCurrentTheme, getDefaultTheme } from '../theme'
+import { get } from '@ltipton/jsutils'
 
 /**
  * Context Provider used to set the theme.
@@ -69,6 +45,8 @@ export const ReThemeProvider = props => {
     // Get the string version of the size to change to
     const sizeToBe = changeToSize[0]
 
+    // Get the current theme to check the size
+    const currentTheme = getCurrentTheme()
     // Get the current size string version
     const currentSize = get(currentTheme, [ 'RTMeta', 'key' ])
 
@@ -84,13 +62,10 @@ export const ReThemeProvider = props => {
   useEffect(() => {
     // Add the event listeners
     Dimensions.addEventListener('change', onChange)
-    addThemeEvent(Constants.BUILD_EVENT, updateCurrentTheme)
 
     // Return a function to remove the event listeners
     return () => {
       Dimensions.removeEventListener('change', onChange)
-      removeThemeEvent(Constants.BUILD_EVENT, updateCurrentTheme)
-      currentTheme = {}
     }
   }, [])
 

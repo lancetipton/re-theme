@@ -1,8 +1,8 @@
 /** @module theme */
 'use strict'
 
-import { deepMerge, isObj } from 'jsutils'
-import { Dimensions } from 'ReDimensions'
+import { deepMerge, isObj } from '@ltipton/jsutils'
+import { Dimensions } from '../dimensions/dimensions'
 import { buildTheme } from './buildTheme'
 
 /**

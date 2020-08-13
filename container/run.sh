@@ -1,5 +1,7 @@
 #!/usr/bin/env
 
+export SUPPRESS_SUPPORT=1
+
 APP_PATH=/keg/app
 
 # If DOC_APP_PATH env is passed override the default app path
@@ -52,16 +54,29 @@ keg_run_app_yarn_setup(){
 
 }
 
+# Allows the docker container to stay running
+keg_docker_sleep(){
+  tail -f /dev/null
+  exit 0
+}
+
+# Runs retheme build / watch proccess automatically
+# This way the build for the app matches the codebase
+keg_retheme_watch_build(){
+  
+  cd $APP_PATH
+  keg_message "Starting bundler for ReTheme"
+  yarn dev 2> retheme.log &
+}
+
 # Uses yarn link, to link the re-theme lib to the local app
 keg_setup_retheme_link(){
 
-  # Setup re-theme to be linkable
-  cd $APP_PATH
-  yarn link
+  local BUILD_PATH=$APP_PATH/app/node_modules/@simpleviewinc/re-theme/build
+  rm -rf $BUILD_PATH
 
-  # Link re-theme to the app
-  cd $APP_PATH/app
-  yarn link "@simpleviewinc/re-theme"
+  # Symlink the re-theme build dir to the app node_module build dir
+  cp -R $APP_PATH/build $BUILD_PATH
 
 }
 
@@ -84,5 +99,11 @@ keg_run_the_app(){
 # Run yarn setup for any extra node_modules to be installed
 keg_run_app_yarn_setup
 
-# Start the keg core instance
+# Link the main retheme repo into the demo app
+keg_setup_retheme_link
+
+# Start the retheme build / watch proccess
+keg_retheme_watch_build
+
+# Start the retheme app
 keg_run_the_app "$@"

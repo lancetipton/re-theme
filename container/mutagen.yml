@@ -7,14 +7,16 @@ sync:
       vcs: true
       paths:
         - "node_modules"
-        - "app/node_modules"
+        - "/app/node_modules"
         - "/node_modules"
         - "/core/base/assets/*"
         - "/.*"
+        - "/retheme.log"
         - "!/.storybook"
         - "!/.npmrc"
         - "*.lock"
         - "*.md"
+        - "!/README.md"
         - "/temp"
         - "/web-build"
         - "/reports"
